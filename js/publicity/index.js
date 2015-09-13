@@ -176,10 +176,6 @@ require(['Zepto'], function () {
         })  
     }
 
-    window.onscroll = function () {
-        loadImages();
-    };
-
     //render the header
     var renderCover = function(mockData){
         var banner = $('header .banner'),
@@ -291,9 +287,15 @@ require(['Zepto'], function () {
             }
         }
 
+        $('header div.mask').show();
         renderCover(mockData);
         renderShots(mockData.pictureStory.shots);
     }
+
+    // window.onscroll = function () {
+    //     loadImages();
+    // };
+
 
     //load data
     $.ajax({
