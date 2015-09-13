@@ -288,6 +288,7 @@ require(['Zepto'], function () {
         }
 
         $('header div.mask').show();
+        $('.loadApp').show();
         renderCover(mockData);
         renderShots(mockData.pictureStory.shots);
     }
