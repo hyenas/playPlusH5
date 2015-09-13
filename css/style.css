@@ -1,0 +1,130 @@
+/**{
+	background-color: #ddd;
+}*/
+
+header{
+	position: relative;
+	height: 6rem;
+	width: 6rem;
+	overflow: hidden;
+}
+
+header div.title{
+	position: absolute;
+    bottom: .35rem;
+    left: .2rem;
+	z-index: 10;
+}
+
+header div.mask{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 5;
+	background:-webkit-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.4));
+}
+
+header div.banner{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 6rem;
+	height: 6rem;
+}
+
+header img{
+	position: absolute;
+}
+
+header .title{
+	color: #fff;
+	font-family: helvetica;
+	font-weight:  bold;
+	font-size: 28px;
+	margin-bottom: 5px;
+}
+
+header .subtitle{
+	color: #fff;
+	font-family: helvetica;
+	font-weight: bold;
+	font-size: 17px;
+}
+
+#shotsDiv{
+	position: relative;
+
+}
+
+#shotsDiv div{
+	box-sizing: border-box;
+	position: absolute;
+	margin: 5px;
+	overflow: hidden;
+}
+
+#shotsDiv img{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+#shotsDiv .text-shot p{
+	line-height: 1rem;
+}
+
+.text-shot .header{
+	font-size: 22px;
+	font-family: Helvetica;
+}
+
+.text-shot .quote{
+	font-size: 28px;
+	font-family: AvenirNextCondensed-UltraLightItalic;
+}
+
+.text-shot .normal{
+	font-size: 16px;
+	font-family: Baskerville;
+}
+
+#shotsDiv div:last-child{
+	margin-bottom: 1.5rem;
+}
+
+.loadApp {
+ 	position: fixed;
+ 	bottom: 0;
+ 	height: 88px;
+ 	width: 100%;
+ 	background-color: rgba(0,0,0,0.8);
+ 	color: #fff;
+}
+
+.description {
+	display: inline-block;
+	position: absolute;
+	top: 33px;
+	left: .3rem;
+	width: 4rem;
+	font-size: .25rem;
+}
+
+.loadBtn {
+	display: inline-block;
+	position: absolute;
+	top:.4rem;
+	right: .5rem;
+	height: .6rem;
+}
+
+.loadBtn div {
+	background-color: #ff2d55;
+	width: 1.3;
+	text-align: center;
+	font-size: .3rem;
+	padding: .1rem;
+	border-radius: .03rem;
+}
