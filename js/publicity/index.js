@@ -18,11 +18,37 @@ require.config({
 });
 
 require(['Zepto'], function () {
-    var isDebug = false,
-        URL = 'http://120.55.148.102/v1.0/shares/works/55f519b47353b4000a1f30f4';
+    var URL = 'http://120.55.148.102/v1.0/shares/works/';
 
     //define global variable
     var textHeight = 0;
+
+    var getURLParam = function(name) { 
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+        var r = window.location.search.substr(1).match(reg); 
+        if (r != null) return unescape(r[2]); return null; 
+    } 
+
+    var getUUID  = function(){
+        var dec2hex = [];
+        for (var i=0; i<=15; i++) {
+          dec2hex[i] = i.toString(16);
+        }     
+
+        var uuid = '';
+        for (var i=1; i<=36; i++) {
+            if (i===9 || i===14 || i===19 || i===24) {
+                uuid += '-';
+            } else if (i===15) {
+                uuid += 4;
+            } else if (i===20) {
+                uuid += dec2hex[(Math.random()*4|0 + 8)];
+            } else {
+                uuid += dec2hex[(Math.random()*15|0)];
+            }
+        }
+        return uuid;
+    }
 
     //lazy load
     var getHeight = function(obj) {
@@ -154,26 +180,6 @@ require(['Zepto'], function () {
         loadImages();
     };
 
-    //load data
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        headers:{
-            'X-Request-ID': 'UUID-002'
-        },
-        url: URL,
-        jsonpCallback:'jsonp1',
-        cache: true,
-        success:function(data) {
-            if(!isDebug){
-                callback(data);
-            }
-        },
-        error:function(data) {
-            // body...
-        }
-    });
-
     //render the header
     var renderCover = function(mockData){
         var banner = $('header .banner'),
@@ -289,7 +295,21 @@ require(['Zepto'], function () {
         renderShots(mockData.pictureStory.shots);
     }
 
-    if(isDebug){
-        callback(mockData);
-    }
+    //load data
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        headers:{
+            'X-Request-ID': getUUID()
+        },
+        url: URL + getURLParam('workId'),
+        jsonpCallback:'jsonp1',
+        cache: true,
+        success:function(data) {
+            callback(data);
+        },
+        error:function(data) {
+            // body...
+        }
+    });
 })
