@@ -99,7 +99,7 @@ require(['Zepto'], function () {
         } 
     }
 
-    var clipCover = function (evt) {
+    var centerCrop = function(evt){
         var img = $(evt.currentTarget),
             div = img.parent(),
             area,
@@ -110,19 +110,8 @@ require(['Zepto'], function () {
             imgWidth = img.width(),
             imgHeight = img.height();   
 
-        if(imgWidth>imgHeight){
-            offset = Math.round(((imgWidth - imgHeight)/ 2) / imgWidth * 100);
-            area.startLoc = {
-                "xPct": offset,
-                "yPct": 0
-            }
-            area.endLoc = {
-                "xPct": 100 - offset,
-                "yPct": 100
-            }
-        }
-        else{
-            offset = Math.round(((imgHeight - imgWidth)/ 2) / imgHeight * 100);
+        if(divWidth/divHeight>imgWidth/imgHeight){
+            offset = Math.round(((imgHeight - imgWidth/divWidth * divHeight)/ 2) / imgHeight * 100);
             area.startLoc = {
                 "xPct": 0,
                 "yPct": offset
@@ -130,6 +119,17 @@ require(['Zepto'], function () {
             area.endLoc = {
                 "xPct": 100,
                 "yPct": 100 - offset
+            }
+        }
+        else{
+            offset = Math.round(((imgWidth - imgHeight/divHeight * divWidth)/ 2) / imgWidth * 100);
+            area.startLoc = {
+                "xPct": offset,
+                "yPct": 0
+            }
+            area.endLoc = {
+                "xPct": 100 - offset,
+                "yPct": 100
             }
         }
 
@@ -156,16 +156,16 @@ require(['Zepto'], function () {
         var img = img,
             div = img.parent(),
             area = img.data('area'),
-            imgWidth = img.width(),
-            imgHeight = img.height();
+            divWidth = div.width(),
+            divHeight = div.height();
 
-        var scaleX =  div.width() / ((area.endLoc.xPct - area.startLoc.xPct) * imgWidth),
-            scaleY =  div.height() / ((area.endLoc.yPct - area.startLoc.yPct) * imgHeight);
+        var scaleX =  1 / (area.endLoc.xPct - area.startLoc.xPct),
+            scaleY =  1 / (area.endLoc.yPct - area.startLoc.yPct);
 
-        var top = area.startLoc.yPct * imgHeight * scaleY,
-            right = area.endLoc.xPct * imgWidth * scaleX,
-            bottom = area.endLoc.yPct * imgHeight * scaleY,
-            left = area.startLoc.xPct * imgWidth * scaleX; 
+        var top = area.startLoc.yPct * divHeight * scaleY,
+            right = area.endLoc.xPct * divWidth * scaleX,
+            bottom = area.endLoc.yPct * divHeight * scaleY,
+            left = area.startLoc.xPct * divWidth * scaleX; 
 
         img.css({
             top: -top + 'px',
@@ -180,14 +180,29 @@ require(['Zepto'], function () {
     var renderCover = function(mockData){
         var banner = $('header .banner'),
             text = $('header div.title'),
-            img = $('<img>',{src: mockData.pictureStory.cover.pictureUrl}),
+            coverImg = $('<img>',{src: mockData.pictureStory.cover.pictureUrl}),
             title = $('<p>',{class:'title'}).text(mockData.title),
-            subtitle = $('<p>',{class:'subtitle'}).text(mockData.subtitle);
+            subtitle = $('<p>',{class:'subtitle'}).text(mockData.subtitle),
+            cover=mockData.pictureStory.cover;
 
-        banner.append(img);
+        banner.append(coverImg);
         text.append(title).append(subtitle);
 
-        img.on('load',clipCover)
+        if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct != -1){
+            coverImg.data('area',cover.picArea);
+            clipImage(coverImg);
+        }
+        else if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct == -1){
+            coverImg.on('load',centerCrop);
+        }
+        else{
+            coverImg.css({
+                width: "100%",
+                height: "100%"
+            });
+        }
+
+        //img.on('load',centerCrop)
     }
 
     //render shots
@@ -220,9 +235,13 @@ require(['Zepto'], function () {
                 shotBlock.append(shotImg);
                 shotsDiv.append(shotBlock);
 
-                if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc != -1){
+                if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct != -1){
                     shotImg.data('area',shot.picAreaInShot);
                     clipImage(shotImg);
+                }
+                else if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct == -1){
+                    shotImg.data('area',shot.size);
+                    shotImg.on('load',centerCrop);
                 }
                 else{
                     shotImg.css({
