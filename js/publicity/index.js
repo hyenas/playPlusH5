@@ -8,59 +8,103 @@
 require.config({
     baseUrl: 'js/vendor/',
     paths: {
-        'Zepto': 'zepto.min'
+        'Zepto': 'zepto.min',
+        'PP': 'PP'
     },
     shim: {
         'Zepto': {
             exports: '$'
-        }
+        },
+        'PP': {
+            deps: ['Zepto']
+        },
     }
 });
 
-require(['Zepto'], function () {
-    var URL = 'http://120.55.148.102/v1.0/shares/works/';
+require(['Zepto','PP'], function () {
+    var work ={};
 
-    //define global variable
-    var textHeight = 0;
+    work.init = function(){
+        //define global variable
+        this._URL = 'http://120.55.148.102/v1.0/shares/works/';
+        this.textHeight = 0;
+        this.mask = "<span class='loading'><span>";
+    };
 
-    var getURLParam = function(name) { 
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
-        var r = window.location.search.substr(1).match(reg); 
-        if (r != null) return unescape(r[2]); return null; 
-    } 
+    work.action = function(){
+        var me = this;
+        //load data
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            headers:{
+                'X-Request-ID': PP.getUUID()
+            },
+            url: me._URL + PP.getURLParam('workId'),
+            jsonpCallback:'jsonp1',
+            cache: true,
+            success:function(data) {
+                me.callback(data);
+            },
+            error:function(data) {
+                // body...
+            }
+        });
+    };
 
-    var getUUID  = function(){
-        var dec2hex = [];
-        for (var i=0; i<=15; i++) {
-          dec2hex[i] = i.toString(16);
-        }     
 
-        var uuid = '';
-        for (var i=1; i<=36; i++) {
-            if (i===9 || i===14 || i===19 || i===24) {
-                uuid += '-';
-            } else if (i===15) {
-                uuid += 4;
-            } else if (i===20) {
-                uuid += dec2hex[(Math.random()*4|0 + 8)];
-            } else {
-                uuid += dec2hex[(Math.random()*15|0)];
+    work.callback = function(mockData){
+        var me = this;
+        //auto adaptation, calculate rem, if failed then default will be 50px
+        PP.setREM(mockData.pictureStory.layout.cols);
+
+        //update title
+        if(mockData.title){
+            window.document.title = mockData.title;
+            var ua = window.navigator.userAgent.toLowerCase(); 
+            if(ua.match(/MicroMessenger/i) == 'micromessenger'){ 
+                // hack the issue can't change document.title in wechat webview 
+                var $iframe = $('<iframe src="/favicon.ico"></iframe>').on('load', function() {
+                    setTimeout(function() {
+                        $iframe.off('load').remove()
+                    }, 0)
+                }).appendTo($('body'));
             }
         }
-        return uuid;
-    }
+
+        $('header div.mask').show();
+        $('.loadApp').show();
+        me.renderCover(mockData);
+        me.renderShots(mockData.pictureStory.shots);
+    };
 
     //lazy load
-    var getHeight = function(obj) {
+    work.getHeight = function(obj) {
         var h = 0;  
         while (obj) {  
             h += obj.offsetTop;  
             obj = obj.offsetParent;  
         }  
         return h;  
-    }
+    };
 
-    var caculateTextPosition = function (index) {
+    work.loadImages = function(){
+        var me=this,
+            images = $("#prdList img"),
+            l=images.length;  
+      
+        for (var i = 0; i < l; i++) {  
+            var img = images[i];
+            //检查img是否在可视区域  
+            var t = document.documentElement.clientHeight + (document.documentElement.scrollTop || document.body.scrollTop);  
+            var h = me.getHeight(img);
+            if (h < t && !img.getAttribute("src")) {
+                img.setAttribute("src",img.getAttribute("data-src"));
+            }  
+        } 
+    };
+
+    work.caculateTextPosition = function (index) {
         var i,
             shotsDiv =  $('#shotsDiv div'),
             l=shotsDiv.length,
@@ -68,38 +112,23 @@ require(['Zepto'], function () {
             shotsArr = [],
             positionTop = 0;
 
-        for(i=l-1; i>l-4 && i>=0; i--){
+        for(i=l-1; i>=0; i--){
             shot = shotsDiv[i];
             shotsArr.push(shot.offsetTop + $(shot).height());
 
         }
 
         positionTop = shotsArr[0];
-        for(i=0; i<2; i++){
+        for(i=0; i<l; i++){
             if(shotsArr[i] < shotsArr[i+1]){
                 positionTop = shotsArr[i+1];
             }
         }
 
         return positionTop;
-    }
+    };
 
-    var loadImages = function(){
-        var images = $("#prdList img"),
-            l=images.length;  
-      
-        for (var i = 0; i < l; i++) {  
-            var img = images[i];
-            //检查img是否在可视区域  
-            var t = document.documentElement.clientHeight + (document.documentElement.scrollTop || document.body.scrollTop);  
-            var h = getHeight(img);
-            if (h < t && !img.getAttribute("src")) {
-                img.setAttribute("src",img.getAttribute("data-src"));
-            }  
-        } 
-    }
-
-    var centerCrop = function(evt){
+    work.centerCrop = function(evt){
         var img = $(evt.currentTarget),
             div = img.parent(),
             area,
@@ -108,7 +137,7 @@ require(['Zepto'], function () {
             divWidth = div.width(),
             divHeight = div.height(),
             imgWidth = img.width(),
-            imgHeight = img.height();   
+            imgHeight = img.height();
 
         if(divWidth/divHeight>imgWidth/imgHeight){
             offset = Math.round(((imgHeight - imgWidth/divWidth * divHeight)/ 2) / imgHeight * 100);
@@ -148,14 +177,16 @@ require(['Zepto'], function () {
             left: -left +'px',
             width: scaleX * 10000 + '%',
             height: scaleY  * 10000+ '%',
-            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
-        }) 
-    }
+            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)',
+            display: 'none'
+        })
 
-    var clipImage = function (img) {
-        var img = img,
-            div = img.parent(),
-            area = img.data('area'),
+        $('img',div).show();
+        $('span.loading',div).hide();
+    };
+
+    work.clipImage = function (img,area) {
+        var div = img.parent(),
             divWidth = div.width(),
             divHeight = div.height();
 
@@ -172,13 +203,22 @@ require(['Zepto'], function () {
             left: -left +'px',
             width: scaleX * 10000 + '%',
             height: scaleY  * 10000+ '%',
-            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
-        })  
+            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)',
+            display: 'none'
+        })
+        //$('span.loading').hide();
+        img.show();
+    };
+
+    work.hideLoading = function(div){
+        $('img',div).show();
+        $('.loading',div).hide();
     }
 
     //render the header
-    var renderCover = function(mockData){
-        var banner = $('header .banner'),
+    work.renderCover = function(mockData){
+        var me=this,
+            banner = $('header .banner'),
             text = $('header div.title'),
             coverImg = $('<img>',{src: mockData.pictureStory.cover.pictureUrl}),
             title = $('<p>',{class:'title'}).text(mockData.title),
@@ -186,14 +226,16 @@ require(['Zepto'], function () {
             cover=mockData.pictureStory.cover;
 
         banner.append(coverImg);
+        banner.append($(me.mask));
         text.append(title).append(subtitle);
 
         if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct != -1){
-            coverImg.data('area',cover.picArea);
-            clipImage(coverImg);
+            //coverImg.data('area',cover.picArea);
+            me.clipImage(coverImg,cover.picArea);
+            coverImg.on('load',me.centerCrop);
         }
         else if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct == -1){
-            coverImg.on('load',centerCrop);
+            coverImg.on('load',me.hideLoading);
         }
         else{
             coverImg.css({
@@ -203,10 +245,10 @@ require(['Zepto'], function () {
         }
 
         //img.on('load',centerCrop)
-    }
+    };
 
     //render shots
-    var renderShots = function(shots){
+    work.renderShots = function(shots){
         var i,
             shot,
             shotType,
@@ -215,7 +257,8 @@ require(['Zepto'], function () {
             shotBlock,
             shotImg,
             shotText,
-            rem = parseInt(document.documentElement.style.fontSize);
+            rem = parseInt(document.documentElement.style.fontSize),
+            me = this;
 
         for(i=0; i<length; i++){
             shot = shots[i];
@@ -228,20 +271,25 @@ require(['Zepto'], function () {
                 shotBlock.css({
                     width: (shot.size.colSpan - 10/rem) + 'rem',
                     height: (shot.size.rowSpan - 10/rem) + 'rem',
-                    top: shot.position.rowIndex + 'rem',
+                    top: (shot.position.rowIndex+me.textHeight) + 'rem',
                     left: shot.position.colIndex + 'rem'
                 })
 
                 shotBlock.append(shotImg);
+                shotBlock.append($(this.mask));
                 shotsDiv.append(shotBlock);
 
+                shotImg.on('load',function(evt){
+                    me.hideLoading();
+                });
+
                 if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct != -1){
-                    shotImg.data('area',shot.picAreaInShot);
-                    clipImage(shotImg);
+                    //shotImg.data('area',shot.picAreaInShot);
+                    me.clipImage(shotImg,shot.picAreaInShot);
                 }
                 else if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct == -1){
                     shotImg.data('area',shot.size);
-                    shotImg.on('load',centerCrop);
+                    shotImg.on('load',me.centerCrop);
                 }
                 else{
                     shotImg.css({
@@ -255,83 +303,26 @@ require(['Zepto'], function () {
                 shotBlock = $('<div>',{class:'text-shot'});
                 shotBlock.css({
                     "text-align": shot.content.alignment,
-                    top: caculateTextPosition()
+                    top: me.caculateTextPosition()
 
                 })
                 
                 shotBlock.append(shotText);
                 shotsDiv.append(shotBlock);
-                textHeight += shotBlock.height()/rem;
+                me.textHeight = me.textHeight + shotBlock.height()/rem - shot.size.rowSpan;
             }
         }
 
-    }
+    };
 
-    var callback = function(mockData){
-        //auto adaptation, calculate rem, if failed then default will be 50px
-        var calculate_size = function () {
-            var BASE_FONT_SIZE = 50,
-                docEl = document.documentElement,
-                clientWidth = docEl.clientWidth;
-            if(clientWidth){
-                docEl.style.fontSize = clientWidth / mockData.pictureStory.layout.cols + 'px';
-            }
-            else{
-                docEl.style.fontSize = BASE_FONT_SIZE +'px';
-            }
-            
-        };
-          
-        // Abort if browser does not support addEventListener
-        if (document.addEventListener) {
-            var resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
-            var docBody = document.body;
-            window.addEventListener(resizeEvt, calculate_size, false);
-            document.addEventListener('DOMContentLoaded', calculate_size, false);
-            calculate_size();
-            docBody.style.display = 'block';
-        }
+    $(function(){
+        work.init();
+        work.action();
+    });
 
-        //update title
-        if(mockData.title){
-            window.document.title = mockData.title;
-            var ua = window.navigator.userAgent.toLowerCase(); 
-            if(ua.match(/MicroMessenger/i) == 'micromessenger'){ 
-                // hack the issue can't change document.title in wechat webview 
-                var $iframe = $('<iframe src="/favicon.ico"></iframe>').on('load', function() {
-                    setTimeout(function() {
-                        $iframe.off('load').remove()
-                    }, 0)
-                }).appendTo($('body'));
-            }
-        }
-
-        $('header div.mask').show();
-        $('.loadApp').show();
-        renderCover(mockData);
-        renderShots(mockData.pictureStory.shots);
-    }
 
     // window.onscroll = function () {
     //     loadImages();
     // };
-
-
-    //load data
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        headers:{
-            'X-Request-ID': getUUID()
-        },
-        url: URL + getURLParam('workId'),
-        jsonpCallback:'jsonp1',
-        cache: true,
-        success:function(data) {
-            callback(data);
-        },
-        error:function(data) {
-            // body...
-        }
-    });
+    
 })

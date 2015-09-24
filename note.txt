@@ -1,0 +1,5 @@
+首先，横竖屏状态是无法用程序控制的，但是，解决方案还是有的：
+
+打开页面时通过window.orientation可以判断网页是横屏还是竖屏，如果是竖屏，给整个页面添加样式transform: rotate(90deg);这样，你的页面就显示横屏的效果了。
+用户看到横屏效果，第一反应是旋转手机，这个时候你可以通过window.orientationchange来捕获这个事件，然后再把transform的rotate变回0即可。
+总的来说，结合window.orientationchange和window.orientation可以灵活的对网页进行变换。
