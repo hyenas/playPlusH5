@@ -120,8 +120,8 @@ require(['Zepto','PP'], function () {
 
         positionTop = shotsArr[0];
         for(i=0; i<l; i++){
-            if(shotsArr[i] < shotsArr[i+1]){
-                positionTop = shotsArr[i+1];
+            if(shotsArr[i] > positionTop){
+                positionTop = shotsArr[i];
             }
         }
 
@@ -242,8 +242,6 @@ require(['Zepto','PP'], function () {
                 height: "100%"
             });
         }
-
-        //img.on('load',centerCrop)
     };
 
     //render shots
@@ -312,6 +310,14 @@ require(['Zepto','PP'], function () {
             }
         }
 
+        var offsetDiv = $("<div class='offset'><div>")
+        offsetDiv.css({
+            width: '100%',
+            height: '.8rem',
+            top: me.caculateTextPosition(),
+            left:0
+        })
+        shotsDiv.append(offsetDiv);
     };
 
     $(function(){

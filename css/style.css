@@ -107,10 +107,6 @@ header .subtitle{
 	font-family: Baskerville;
 }
 
-#shotsDiv div:last-child{
-	margin-bottom: .9rem;
-}
-
 .loadApp {
 	display: none;
  	position: fixed;
