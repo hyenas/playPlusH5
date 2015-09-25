@@ -230,12 +230,11 @@ require(['Zepto','PP'], function () {
         text.append(title).append(subtitle);
 
         if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct != -1){
-            //coverImg.data('area',cover.picArea);
+            coverImg.on('load',me.hideLoading);
             me.clipImage(coverImg,cover.picArea);
-            coverImg.on('load',me.centerCrop);
         }
         else if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct == -1){
-            coverImg.on('load',me.hideLoading);
+            coverImg.on('load',me.centerCrop);
         }
         else{
             coverImg.css({
