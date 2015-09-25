@@ -36,8 +36,8 @@ header div.banner{
 }
 
 header img{
+	visibility: hidden;
 	position: absolute;
-	display: none;
 }
 
 header span.loading{
@@ -76,8 +76,8 @@ header .subtitle{
 }
 
 #shotsDiv img{
+	visibility: hidden;
 	position: absolute;
-	display: none;
 	z-index: 0;
 }
 
