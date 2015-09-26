@@ -120,8 +120,8 @@ require(['Zepto','PP'], function () {
 
         positionTop = shotsArr[0];
         for(i=0; i<l; i++){
-            if(shotsArr[i] < shotsArr[i+1]){
-                positionTop = shotsArr[i+1];
+            if(shotsArr[i] > positionTop){
+                positionTop = shotsArr[i];
             }
         }
 
@@ -173,15 +173,14 @@ require(['Zepto','PP'], function () {
             left = area.startLoc.xPct * divWidth * scaleX; 
 
         img.css({
+            visibility: 'visible',
             top: -top + 'px',
             left: -left +'px',
             width: scaleX * 10000 + '%',
             height: scaleY  * 10000+ '%',
-            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)',
-            display: 'none'
+            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
         })
 
-        $('img',div).show();
         $('span.loading',div).hide();
     };
 
@@ -203,15 +202,18 @@ require(['Zepto','PP'], function () {
             left: -left +'px',
             width: scaleX * 10000 + '%',
             height: scaleY  * 10000+ '%',
-            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)',
-            display: 'none'
+            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
         })
         //$('span.loading').hide();
         img.show();
     };
 
-    work.hideLoading = function(div){
-        $('img',div).show();
+    work.hideLoading = function(evt){
+        var img = $(evt.currentTarget),
+            div = img.parent();
+        img.css({
+            visibility:'visable'
+        });
         $('.loading',div).hide();
     }
 
@@ -230,21 +232,21 @@ require(['Zepto','PP'], function () {
         text.append(title).append(subtitle);
 
         if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct != -1){
-            //coverImg.data('area',cover.picArea);
-            me.clipImage(coverImg,cover.picArea);
-            coverImg.on('load',me.centerCrop);
-        }
-        else if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct == -1){
             coverImg.on('load',me.hideLoading);
+            me.clipImage(coverImg,cover.picArea);
         }
         else{
-            coverImg.css({
-                width: "100%",
-                height: "100%"
-            });
+            coverImg.on('load',me.centerCrop);
         }
-
-        //img.on('load',centerCrop)
+        // else if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct == -1){
+        //     coverImg.on('load',me.centerCrop);
+        // }
+        // else{
+        //     coverImg.css({
+        //         width: "100%",
+        //         height: "100%"
+        //     });
+        // }
     };
 
     //render shots
@@ -276,27 +278,28 @@ require(['Zepto','PP'], function () {
                 })
 
                 shotBlock.append(shotImg);
-                shotBlock.append($(this.mask));
+                shotBlock.append($(me.mask));
                 shotsDiv.append(shotBlock);
-
-                shotImg.on('load',function(evt){
-                    me.hideLoading();
-                });
 
                 if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct != -1){
                     //shotImg.data('area',shot.picAreaInShot);
+                    coverImg.on('load',me.hideLoading);
                     me.clipImage(shotImg,shot.picAreaInShot);
                 }
-                else if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct == -1){
-                    shotImg.data('area',shot.size);
+                else{
+                    //shotImg.data('area',shot.size);
                     shotImg.on('load',me.centerCrop);
                 }
-                else{
-                    shotImg.css({
-                        width: "100%",
-                        height: "100%"
-                    });
-                }
+                // else if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct == -1){
+                //     shotImg.data('area',shot.size);
+                //     shotImg.on('load',me.centerCrop);
+                // }
+                // else{
+                //     shotImg.css({
+                //         width: "100%",
+                //         height: "100%"
+                //     });
+                // }
             }
             else if(shotType == 'text'){
                 shotText = $('<p>',{class:shot.content.charStyle}).text(shot.content.text);
@@ -313,6 +316,14 @@ require(['Zepto','PP'], function () {
             }
         }
 
+        var offsetDiv = $("<div class='offset'><div>")
+        offsetDiv.css({
+            width: '100%',
+            height: '.8rem',
+            top: me.caculateTextPosition(),
+            left:0
+        })
+        shotsDiv.append(offsetDiv);
     };
 
     $(function(){

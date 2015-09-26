@@ -36,8 +36,8 @@ header div.banner{
 }
 
 header img{
+	visibility: hidden;
 	position: absolute;
-	display: none;
 }
 
 header span.loading{
@@ -76,8 +76,8 @@ header .subtitle{
 }
 
 #shotsDiv img{
+	visibility: hidden;
 	position: absolute;
-	display: none;
 	z-index: 0;
 }
 
@@ -105,10 +105,6 @@ header .subtitle{
 	line-height: 22px;
 	font-size: 16px;
 	font-family: Baskerville;
-}
-
-#shotsDiv div:last-child{
-	margin-bottom: .9rem;
 }
 
 .loadApp {
