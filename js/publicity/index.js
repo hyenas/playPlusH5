@@ -26,7 +26,7 @@ require(['Zepto','PP'], function () {
 
     work.init = function(){
         //define global variable
-        this._URL = 'http://120.55.206.153/v1.0/shares/works/';
+        this._URL = 'http://api.playplus.me/v1.0/shares/works/';
         this.textHeight = 0;
         this.mask = "<span class='loading'><span>";
     };
