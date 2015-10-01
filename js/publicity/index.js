@@ -26,7 +26,7 @@ require(['Zepto','PP'], function () {
 
     work.init = function(){
         //define global variable
-        this._URL = 'http://120.55.148.102/v1.0/shares/works/';
+        this._URL = 'http://api.playplus.me/v1.0/shares/works/';
         this.textHeight = 0;
         this.mask = "<span class='loading'><span>";
     };
@@ -212,7 +212,7 @@ require(['Zepto','PP'], function () {
         var img = $(evt.currentTarget),
             div = img.parent();
         img.css({
-            visibility:'visable'
+            visibility:'visible'
         });
         $('.loading',div).hide();
     }
@@ -283,7 +283,7 @@ require(['Zepto','PP'], function () {
 
                 if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct != -1){
                     //shotImg.data('area',shot.picAreaInShot);
-                    coverImg.on('load',me.hideLoading);
+                    shotImg.on('load',me.hideLoading);
                     me.clipImage(shotImg,shot.picAreaInShot);
                 }
                 else{
