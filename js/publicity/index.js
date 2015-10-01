@@ -283,7 +283,7 @@ require(['Zepto','PP'], function () {
 
                 if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct != -1){
                     //shotImg.data('area',shot.picAreaInShot);
-                    coverImg.on('load',me.hideLoading);
+                    shotImg.on('load',me.hideLoading);
                     me.clipImage(shotImg,shot.picAreaInShot);
                 }
                 else{
