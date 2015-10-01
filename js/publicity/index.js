@@ -321,7 +321,8 @@ require(['Zepto','PP'], function () {
             width: '100%',
             height: '.8rem',
             top: me.caculateTextPosition(),
-            left:0
+            left:0,
+            margin:'5px 0 0 0'
         })
         shotsDiv.append(offsetDiv);
     };
