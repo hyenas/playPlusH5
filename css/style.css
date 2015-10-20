@@ -126,9 +126,10 @@ header .subtitle{
 	font-size: .25rem;
 }
 
-.description .app-name{
+.description .app-name a{
 	font-size: .3rem;
 	color: #00CCCC;
+	text-decoration: none;
 }
 
 .loadBtn {
@@ -145,4 +146,9 @@ header .subtitle{
 	font-size: .3rem;
 	padding: .1rem;
 	border-radius: .03rem;
+}
+
+.loadBtn a{
+	color: #fff;
+	text-decoration: none;
 }
