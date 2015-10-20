@@ -22,7 +22,8 @@ require.config({
 });
 
 require(['Zepto','PP'], function () {
-    var work ={};
+    var work = {};
+    work.data = {};
 
     work.init = function(){
         //define global variable
@@ -30,6 +31,17 @@ require(['Zepto','PP'], function () {
         this._URL = 'http://120.55.148.102/v1.0/shares/works/';
         this.textHeight = 0;
         this.mask = "<span class='loading'><span>";
+        function onResize(){
+            work.textHeight = 0;
+            work.callback(work.data);
+            // if(window.orientation==180||window.orientation==0){
+                // alert("竖屏状态！")
+            // }
+            // if(window.orientation==90||window.orientation==-90){
+                // alert("横屏状态！")
+            // }
+        }
+        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", onResize, false);
     };
 
     work.action = function(){
@@ -45,6 +57,7 @@ require(['Zepto','PP'], function () {
             jsonpCallback:'jsonp1',
             cache: true,
             success:function(data) {
+                work.data = data;
                 me.callback(data);
             },
             error:function(data) {
@@ -228,6 +241,8 @@ require(['Zepto','PP'], function () {
             subtitle = $('<p>',{class:'subtitle'}).text(mockData.subtitle),
             cover=mockData.pictureStory.cover;
 
+        $("header div").empty();
+
         banner.append(coverImg);
         banner.append($(me.mask));
         text.append(title).append(subtitle);
@@ -262,6 +277,8 @@ require(['Zepto','PP'], function () {
             shotText,
             rem = parseInt(document.documentElement.style.fontSize),
             me = this;
+
+        $("#shotsDiv").empty();
 
         for(i=0; i<length; i++){
             shot = shots[i];
