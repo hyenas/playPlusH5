@@ -89,19 +89,19 @@ header .subtitle{
 	background:url(../img/loading.gif) no-repeat center center;
 }
 
-.text-shot .header{
+.text-shot .header,.presentation .header{
 	line-height: 28px;
 	font-size: 22px;
 	font-family: Helvetica;
 }
 
-.text-shot .quote{
+.text-shot .quote,.presentation .quote{
 	line-height: 34px;
 	font-size: 28px;
 	font-family: AvenirNextCondensed-UltraLightItalic;
 }
 
-.text-shot .normal{
+.text-shot .normal,.presentation .normal{
 	line-height: 22px;
 	font-size: 16px;
 	font-family: Baskerville;

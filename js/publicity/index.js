@@ -9,7 +9,8 @@ require.config({
     baseUrl: 'js/vendor/',
     paths: {
         'Zepto': 'zepto.min',
-        'PP': 'PP'
+        'PP': 'PP',
+        'slider': 'slider'
     },
     shim: {
         'Zepto': {
@@ -18,10 +19,13 @@ require.config({
         'PP': {
             deps: ['Zepto']
         },
+        'slider': {
+            deps: ['Zepto']
+        }
     }
 });
 
-require(['Zepto','PP'], function () {
+require(['Zepto','PP','slider'], function () {
     var work = {};
     work.data = {};
 
@@ -30,16 +34,24 @@ require(['Zepto','PP'], function () {
         // online this._URL = 'http://api.playplus.me/v1.0/shares/works/';
         this._URL = 'http://120.55.148.102/v1.0/shares/works/';
         this.textHeight = 0;
+        this.isSlideRender = false;
         this.mask = "<span class='loading'><span>";
         function onResize(){
-            work.textHeight = 0;
-            work.callback(work.data);
-            // if(window.orientation==180||window.orientation==0){
-                // alert("竖屏状态！")
-            // }
-            // if(window.orientation==90||window.orientation==-90){
-                // alert("横屏状态！")
-            // }
+            if(screen.width < screen.height){
+                $('.stream').show();
+                $('.presentation').hide();
+                work.textHeight = 0;
+                work.callback(work.data);
+            }
+            else{
+                $('.stream').hide();
+                $('.presentation').show();
+                if(!this.isSlideRender){
+                    this.isSlideRender = true;
+                    work.presentation(work.data.presentation.slides);
+                }
+            }
+            
         }
         window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", onResize, false);
     };
@@ -90,6 +102,42 @@ require(['Zepto','PP'], function () {
         $('.loadApp').show();
         me.renderCover(mockData);
         me.renderShots(mockData.pictureStory.shots);
+    };
+
+    work.presentation = function(data) {
+        var i,
+            l = data.length,
+            slideArr = [],
+            textBlock,
+            slideLi;
+        for(i=0; i<l; i++){
+            if(data[i].content.type == 'image'){
+                slideLi = "<li><img src=" + data[i].content.pictureUrl + "></li>";
+            }
+            else if(data[i].content.type == 'text'){
+                textBlock = "<p class='" + data[i].content.charStyle + "'>" + data[i].content.text + "</p>"
+                textBlock = $(textBlock).css({
+                    'text-align': data[i].content.alignment
+                })
+
+                slideLi = $("<li>").append(textBlock);
+            }
+
+            slideArr.push(slideLi);
+        }
+
+        $(".presentation").mobileSlider({
+            images:slideArr,
+            height: screen.height,
+            during: 3000,
+            speed: 100
+        })
+
+        work.moveSlider = function(index){
+            $('ul',$(".presentation")).css({
+                left: '-' + index * $(window).width()
+            })
+        };
     };
 
     //lazy load
@@ -308,16 +356,6 @@ require(['Zepto','PP'], function () {
                     //shotImg.data('area',shot.size);
                     shotImg.on('load',me.centerCrop);
                 }
-                // else if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct == -1){
-                //     shotImg.data('area',shot.size);
-                //     shotImg.on('load',me.centerCrop);
-                // }
-                // else{
-                //     shotImg.css({
-                //         width: "100%",
-                //         height: "100%"
-                //     });
-                // }
             }
             else if(shotType == 'text'){
                 shotText = $('<p>',{class:shot.content.charStyle}).text(shot.content.text);

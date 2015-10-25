@@ -7,7 +7,7 @@
  * @example
  * $(".slider").mobileSlider({
  *     images:["images/1.jpg","images/2.jpg","images/3.jpg","images/4.jpg"],
- *     links:["wanlitong.com","wanlitong.com","wanlitong.com","wanlitong.com"],
+ *     links:["baidu.com","baidu.com","baidu.com","baidu.com"],
  *     width: 375,
  *     height: 216,
  *     switcher: true,
@@ -55,27 +55,18 @@
             }
 
             if(l==1){
-                if(links[0]){
-                    _this.append("<a href='" + links[0] + "'><img src="+ imgs[0] +"></a>");
-                }
-                else{
-                    _this.append("<a><img src="+ imgs[0] +"></a>");
-                }
+
+                _this.append("<img src="+ imgs[0] +">");
                 return;
             }
 
             var oMover = $("<ul>").appendTo(_this);
 
             for(var i=0; i<l; i++){
-                if(links[i]){
-                    oMover.append("<li><a href='" + links[i] + "'><img src="+ imgs[i] +"></a></li>");
-                }
-                else{
-                    oMover.append("<li><a><img src="+ imgs[i] +"></a></li>");
-                }
+                oMover.append(imgs[i]);
             }
-            oMover.prepend("<li><a><img src="+ imgs[l-1] +"></a></li>");
-            oMover.append("<li><a><img src="+ imgs[0] +"></a></li>");
+            oMover.prepend("<li><img src="+ imgs[l-1] +"></li>");
+            oMover.append("<li><img src="+ imgs[0] +"></li>");
 
             var oLi = $("li", oMover);
             var lgh = oLi.length;
@@ -92,13 +83,52 @@
             });
             oLi.css({
                 float: 'left',
-                display: 'inline'
-            });
-            $("img", oLi).css({
-                width: '100%',
-                height: '100%'
+                display: 'inline',
+                height: $(window).height(),
+                width: $(window).width(),
+                background: '#333',
+                border: 'none'
             });
 
+            //$("img",_this).on('load',onImageLoad);
+            $("img",_this).each(function(index, el) {
+                var li = $(el).parents('li'),
+                    liWidth = li.width(),
+                    liHeight = li.height(),
+                    elWidth = $(el).width(),
+                    elHeight = $(el).height();
+
+                if(elWidth/elHeight > liWidth/liHeight){
+                    $(el).css({
+                        display: 'block',
+                        width: '100%'
+                    })
+                    // $(el).css({
+                    //     'margin-top': (liHeight - elHeight)/2 + 'px'
+                    // })
+                }
+                else(
+                    $(el).css({
+                        display: 'block',
+                        height: '100%',
+                        margin: '0 auto'
+                    })
+                )
+            });
+
+            $("p",_this).each(function(index,el){
+                var li = $(el).parents('li'),
+                    liWidth = li.width(),
+                    liHeight = li.height(),
+                    elWidth = $(el).width(),
+                    elHeight = $(el).height();
+
+                $(el).css({
+                    padding: '0 15px',
+                    'margin-top': (liHeight - elHeight)/2 + 'px'
+                })
+            });
+            
             //init focus
             _this.append('<div class="slide-focus"><div></div></div>');
             var oFocusContainer = $(".slide-focus");
@@ -167,6 +197,12 @@
                     if (fn) 
                         fn();
                 });
+            }
+
+            function onImageLoad(evt){
+                var img = $(evt.currentTarget),
+                    div = img.parent().parent;
+                debugger;
             }
 
             function bindTochuEvent(){
