@@ -6,8 +6,7 @@
  * @date 2015-9-15
  * @example
  * $(".slider").mobileSlider({
- *     images:["images/1.jpg","images/2.jpg","images/3.jpg","images/4.jpg"],
- *     links:["baidu.com","baidu.com","baidu.com","baidu.com"],
+ *     blocks:["images/1.jpg","images/2.jpg","images/3.jpg","images/4.jpg"],
  *     width: 375,
  *     height: 216,
  *     switcher: true,
@@ -27,6 +26,7 @@
         }
 
         settings = $.extend(true, {}, defaultSettings, settings);
+
         return this.each(function(){
             //global variable
             var _this = $(this), s = settings;
@@ -46,9 +46,8 @@
             _this.empty();
 
             //init slides list
-            var imgs = settings.images,
-                links = settings.links,
-                l = imgs.length;
+            var blocks = settings.blocks,
+                l = blocks.length;
             if(l==0){
                 console.log("images is required");
                 return;
@@ -56,17 +55,17 @@
 
             if(l==1){
 
-                _this.append("<img src="+ imgs[0] +">");
+                _this.append("<img src="+ blocks[0] +">");
                 return;
             }
 
             var oMover = $("<ul>").appendTo(_this);
 
             for(var i=0; i<l; i++){
-                oMover.append(imgs[i]);
+                oMover.append(blocks[i]);
             }
-            oMover.prepend("<li><img src="+ imgs[l-1] +"></li>");
-            oMover.append("<li><img src="+ imgs[0] +"></li>");
+            oMover.prepend(blocks[l-1]);
+            oMover.append(blocks[0]);
 
             var oLi = $("li", oMover);
             var lgh = oLi.length;
@@ -129,43 +128,6 @@
                 })
             });
             
-            //init focus
-            _this.append('<div class="slide-focus"><div></div></div>');
-            var oFocusContainer = $(".slide-focus");
-            for (var i = 0; i < num; i++) {
-                $("div", oFocusContainer).append("<span></span>");
-            }
-            var oFocus = $("span", oFocusContainer);
-            oFocusContainer.width(s.width).height(s.height * 0.15).css({
-                zIndex: 2,
-                minHeight: $(this).find('span').height() * 2,
-                position: 'absolute',
-                bottom: 0
-            });
-            $("span", oFocusContainer).css({
-                display: 'block',
-                float: 'left',
-                cursor: 'pointer'
-            });
-            $("div", oFocusContainer).width(20 * (num)).css({
-                'min-height': 20,
-                position: 'absolute',
-                right: 10,
-                top: '50%',
-                marginTop: -$(this).find('span').width() / 2
-            });
-            oFocus.first().addClass("current");
-
-            $(window).bind('resize', function(){
-                scale();
-                oLi.width(s.width).height(s.height);
-                oMover.width((lgh) * oLi.width());
-                oFocusContainer.width(_this.width()).height(_this.height() * 0.15).css({
-                    zIndex: 2
-                });//设定焦点容器宽高样式
-                _this.fadeIn(300);
-            });
-
             bindTochuEvent();
             autoMove();
 
@@ -186,7 +148,6 @@
                         iCurr = 1;
                         oMover[0].style.left = -moveWidth +'px';
                     }
-                    oFocus.eq(iCurr-1).addClass("current").siblings().removeClass("current");
                 });
             }
 
@@ -202,7 +163,6 @@
             function onImageLoad(evt){
                 var img = $(evt.currentTarget),
                     div = img.parent().parent;
-                debugger;
             }
 
             function bindTochuEvent(){
@@ -241,14 +201,12 @@
                         if (iCurr > 0 && iCurr <= num) {
                             var moveX = iCurr * moveWidth;
                             doAnimate(-moveX, autoMove);
-                            correctFocus(iCurr);
                         }
                         else if(iCurr==0){
                             doAnimate(0,function(){
                                 iCurr = num;
                                 oMover[0].style.left = -moveWidth * num +'px';
                                 autoMove();
-                                correctFocus(iCurr);
                             });
                         }
                         else if(iCurr == num + 1){
@@ -256,7 +214,6 @@
                                 iCurr = 1;
                                 oMover[0].style.left = -moveWidth +'px';
                                 autoMove();
-                                correctFocus(iCurr);
                             });
                         }
                     }
@@ -265,14 +222,12 @@
                         if (iCurr <= num && iCurr > 0) {
                             var moveX = iCurr * moveWidth;
                             doAnimate(-moveX, autoMove);
-                            correctFocus(iCurr);
                         }
                         else if(iCurr==0){
                             doAnimate(0,function(){
                                 iCurr = num;
                                 oMover[0].style.left = -moveWidth * num +'px';
                                 autoMove();
-                                correctFocus(iCurr);
                             });
                         }
                         else if(iCurr == num + 1){
@@ -280,15 +235,10 @@
                                 iCurr = 1;
                                 oMover[0].style.left = -moveWidth +'px';
                                 autoMove();
-                                correctFocus(iCurr);
                             });
                         }
                     }
                 }
-            }
-
-            function correctFocus(iCurr){
-                oFocus.eq(iCurr-1).addClass("current").siblings().removeClass("current");
             }
 
             function scale(){

@@ -26,18 +26,19 @@ require.config({
 });
 
 require(['Zepto','PP','slider'], function () {
+    //setTimeout(window.scrollTo(0, 0), 1);
     var work = {};
     work.data = {};
+    work.isSlideRender = false;
 
     work.init = function(){
         //define global variable
         // online this._URL = 'http://api.playplus.me/v1.0/shares/works/';
-        this._URL = 'http://120.55.148.102/v1.0/shares/works/';
+        this._URL = 'http://test.api.playplus.me/v1.0/shares/works/';
         this.textHeight = 0;
-        this.isSlideRender = false;
         this.mask = "<span class='loading'><span>";
         function onResize(){
-            if(screen.width < screen.height){
+            if($(window).width() < $(window).height()){
                 $('.stream').show();
                 $('.presentation').hide();
                 work.textHeight = 0;
@@ -46,14 +47,14 @@ require(['Zepto','PP','slider'], function () {
             else{
                 $('.stream').hide();
                 $('.presentation').show();
-                if(!this.isSlideRender){
-                    this.isSlideRender = true;
+                if(!work.isSlideRender){
+                    work.isSlideRender = true;
                     work.presentation(work.data.presentation.slides);
                 }
             }
             
         }
-        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", onResize, false);
+        window.addEventListener("orientationchange" in window ? "orientationchange" : "resize", onResize, false);
     };
 
     work.action = function(){
@@ -82,7 +83,7 @@ require(['Zepto','PP','slider'], function () {
     work.callback = function(mockData){
         var me = this;
         //auto adaptation, calculate rem, if failed then default will be 50px
-        PP.setREM(mockData.pictureStory.layout.cols);
+        PP.setREM(mockData.story.layout.cols);
 
         //update title
         if(mockData.title){
@@ -101,7 +102,7 @@ require(['Zepto','PP','slider'], function () {
         $('header div.mask').show();
         $('.loadApp').show();
         me.renderCover(mockData);
-        me.renderShots(mockData.pictureStory.shots);
+        me.renderShots(mockData.story.shots);
     };
 
     work.presentation = function(data) {
@@ -110,25 +111,21 @@ require(['Zepto','PP','slider'], function () {
             slideArr = [],
             textBlock,
             slideLi;
+
         for(i=0; i<l; i++){
             if(data[i].content.type == 'image'){
                 slideLi = "<li><img src=" + data[i].content.pictureUrl + "></li>";
             }
             else if(data[i].content.type == 'text'){
-                textBlock = "<p class='" + data[i].content.charStyle + "'>" + data[i].content.text + "</p>"
-                textBlock = $(textBlock).css({
-                    'text-align': data[i].content.alignment
-                })
-
-                slideLi = $("<li>").append(textBlock);
+                slideLi = "<li><p class='" + data[i].content.charStyle + "' style=\"text-align:" + data[i].content.alignment + ";\">" + data[i].content.text + "</p></li>"
             }
 
             slideArr.push(slideLi);
         }
 
         $(".presentation").mobileSlider({
-            images:slideArr,
-            height: screen.height,
+            blocks:slideArr,
+            height: $(window).height(),
             during: 3000,
             speed: 100
         })
@@ -284,10 +281,10 @@ require(['Zepto','PP','slider'], function () {
         var me=this,
             banner = $('header .banner'),
             text = $('header div.title'),
-            coverImg = $('<img>',{src: mockData.pictureStory.cover.pictureUrl}),
+            coverImg = $('<img>',{src: mockData.story.cover.pictureUrl}),
             title = $('<p>',{class:'title'}).text(mockData.title),
             subtitle = $('<p>',{class:'subtitle'}).text(mockData.subtitle),
-            cover=mockData.pictureStory.cover;
+            cover=mockData.story.cover;
 
         $("header div").empty();
 
@@ -302,15 +299,6 @@ require(['Zepto','PP','slider'], function () {
         else{
             coverImg.on('load',me.centerCrop);
         }
-        // else if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct == -1){
-        //     coverImg.on('load',me.centerCrop);
-        // }
-        // else{
-        //     coverImg.css({
-        //         width: "100%",
-        //         height: "100%"
-        //     });
-        // }
     };
 
     //render shots
