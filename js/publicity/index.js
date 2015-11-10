@@ -47,10 +47,11 @@ require(['Zepto','PP','slider'], function () {
             else{
                 $('.stream').hide();
                 $('.presentation').show();
-                if(!work.isSlideRender){
-                    work.isSlideRender = true;
+                //if(!work.isSlideRender){
+                //    work.isSlideRender = true;
+                //    window.WeixinJSBridge.call('hideToolbar');
                     work.presentation(work.data.presentation.slides);
-                }
+                //}
             }
             
         }
