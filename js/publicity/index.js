@@ -47,11 +47,10 @@ require(['Zepto','PP','slider'], function () {
             else{
                 $('.stream').hide();
                 $('.presentation').show();
-                //if(!work.isSlideRender){
-                //    work.isSlideRender = true;
-                //    window.WeixinJSBridge.call('hideToolbar');
+                if(!work.isSlideRender){
+                    work.isSlideRender = true;
                     work.presentation(work.data.presentation.slides);
-                //}
+                }
             }
             
         }
@@ -124,12 +123,14 @@ require(['Zepto','PP','slider'], function () {
             slideArr.push(slideLi);
         }
 
-        $(".presentation").mobileSlider({
-            blocks:slideArr,
-            height: $(window).height(),
-            during: 3000,
-            speed: 100
-        })
+        setTimeout(function(){
+            $(".presentation").mobileSlider({
+                blocks:slideArr,
+                height: $(window).height(),
+                during: 3000,
+                speed: 100
+            })
+        }(), 500)
 
         work.moveSlider = function(index){
             $('ul',$(".presentation")).css({
