@@ -34,7 +34,7 @@ require(['Zepto','PP','slider'], function () {
     work.init = function(){
         //define global variable
         // online this._URL = 'http://api.playplus.me/v1.0/shares/works/';
-        this._URL = 'https://test.api.playplus.me/v1.0/shares/works/';
+        this._URL = 'http://test.api.playplus.me/v1.0/shares/works/';
         this.textHeight = 0;
         this.mask = "<span class='loading'><span>";
         function onResize(){
