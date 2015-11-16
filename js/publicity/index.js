@@ -30,31 +30,18 @@ require(['Zepto','PP','slider'], function () {
     var work = {};
     work.data = {};
     work.isSlideRender = false;
+    work.presentationHeight = $(window).width();
 
     work.init = function(){
         //define global variable
         // online this._URL = 'http://api.playplus.me/v1.0/shares/works/';
-        this._URL = 'https://test.api.playplus.me/v1.0/shares/works/';
+        this._URL = 'http://test.api.playplus.me/v1.0/shares/works/';
         this.textHeight = 0;
         this.mask = "<span class='loading'><span>";
-        function onResize(){
-            if($(window).width() < $(window).height()){
-                $('.stream').show();
-                $('.presentation').hide();
-                work.textHeight = 0;
-                work.callback(work.data);
-            }
-            else{
-                $('.stream').hide();
-                $('.presentation').show();
-                if(!work.isSlideRender){
-                    work.isSlideRender = true;
-                    work.presentation(work.data.presentation.slides);
-                }
-            }
-            
-        }
-        window.addEventListener("orientationchange" in window ? "orientationchange" : "resize", onResize, false);
+        
+        window.addEventListener("orientationchange" in window ? "orientationchange" : "resize", work.onResize, false);
+
+        work.bindtTransform();
     };
 
     work.action = function(){
@@ -99,13 +86,13 @@ require(['Zepto','PP','slider'], function () {
             }
         }
 
-        $('header div.mask').show();
-        $('.loadApp').show();
+        $('header div.mask').css('display','block')
+        $('.loadApp').css('display','block');
         me.renderCover(mockData);
         me.renderShots(mockData.story.shots);
     };
 
-    work.presentation = function(data) {
+    work.assemblySlider = function(data){
         var i,
             l = data.length,
             slideArr = [],
@@ -116,27 +103,20 @@ require(['Zepto','PP','slider'], function () {
             if(data[i].content.type == 'image'){
                 slideLi = "<li><img src=" + data[i].content.pictureUrl + "></li>";
             }
-            else if(data[i].content.type == 'text'){
-                slideLi = "<li><p class='" + data[i].content.charStyle + "' style=\"text-align:" + data[i].content.alignment + ";\">" + data[i].content.text + "</p></li>"
-            }
+            // else if(data[i].content.type == 'text'){
+            //     slideLi = "<li><p class='" + data[i].content.charStyle + "' style=\"text-align:" + data[i].content.alignment + ";\">" + data[i].content.text + "</p></li>"
+            // }
 
             slideArr.push(slideLi);
         }
 
-        setTimeout(function(){
-            $(".presentation").mobileSlider({
-                blocks:slideArr,
-                height: $(window).height(),
-                during: 3000,
-                speed: 100
-            })
-        }(), 500)
+        return slideArr;
+    };  
 
-        work.moveSlider = function(index){
-            $('ul',$(".presentation")).css({
-                left: '-' + index * $(window).width()
-            })
-        };
+    work.moveSlider = function(index){
+        $('ul',$(".presentation")).css({
+            left: '-' + index * $(window).width()
+        })
     };
 
     //lazy load
@@ -266,7 +246,7 @@ require(['Zepto','PP','slider'], function () {
             clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
         })
         //$('span.loading').hide();
-        img.show();
+        img.css('display','block');
     };
 
     work.hideLoading = function(evt){
@@ -371,6 +351,56 @@ require(['Zepto','PP','slider'], function () {
             margin:'5px 0 0 0'
         })
         shotsDiv.append(offsetDiv);
+        $('body').css('background-color', '#000');
+    };
+
+    work.onResize = function(){
+        if($(window).width() < $(window).height()){
+            $('.stream').css("display","block");
+            $('.presentation').hide();
+            $('body').css({
+                'overflow': 'scroll'
+            })
+            work.presentationHeight = $(window).width();
+            work.textHeight = 0;
+            work.callback(work.data);
+        }
+        else{
+            $('.stream').hide();
+            $('.presentation').css({
+                display:'block'
+            });
+
+           $(".presentation").empty();
+           
+           $(".presentation").mobileSlider({
+                blocks: work.assemblySlider(work.data.presentation.slides),
+                width: $(window).width(),
+                height: $(window).height(),
+                during: 3000,
+                speed: 100
+            })
+
+        }
+    }
+
+    work.bindtTransform = function() {
+        $('#shotsDiv').on('click','div',function(){
+            $('.stream').hide();
+            $('.presentation').css({
+                display: "block",
+            });
+            
+            $(".presentation").empty();
+
+            $(".presentation").carousel({
+                blocks: work.assemblySlider(work.data.presentation.slides),
+                width: $(window).width(),
+                height: $(window).height(),
+                during: 3000,
+                speed: 100
+            })
+        })
     };
 
     $(function(){

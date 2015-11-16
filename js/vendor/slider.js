@@ -271,4 +271,258 @@
             }
         });
     }
+
+    $.fn.carousel = function(settings){
+        var defaultSettings = {
+            links:[],
+            width: $(window).width(), //container width
+            height: $(window).width() * 0.47, //container height
+            switcher: false, //switcher
+            during: 5000, //interval
+            speed:30 //slide speed
+        }
+
+        settings = $.extend(true, {}, defaultSettings, settings);
+
+        return this.each(function(){
+            //global variable
+            var _this = $(this), s = settings;
+            var startX = 0, startY = 0;
+            var temPos; //temp position
+            var iCurr = 1; //current page
+            var timer = null; // timer handle
+            var oPosition = {}; //touch position
+            var moveHeight = s.height; //move width
+            var oriWidth = $(window).width();
+
+            //init container style
+            _this.width(s.width).height(s.height).css({
+                position: 'relative',
+                overflow: 'hidden'
+            });
+            _this.empty();
+
+            //init slides list
+            var blocks = settings.blocks,
+                l = blocks.length;
+            if(l==0){
+                console.log("images is required");
+                return;
+            }
+
+            if(l==1){
+
+                _this.append("<img src="+ blocks[0] +">");
+                return;
+            }
+
+            var oMover = $("<ul>").appendTo(_this);
+
+            for(var i=0; i<l; i++){
+                oMover.append(blocks[i]);
+            }
+            oMover.prepend(blocks[l-1]);
+            oMover.append(blocks[0]);
+
+            var oLi = $("li", oMover);
+            var lgh = oLi.length;
+            var num = lgh -2; //page number
+
+            oLi.width(s.width).height(s.height);
+            oMover.width(s.width).height((lgh) * oLi.height());
+
+            oMover.css({
+                padding:0,
+                margin:0,
+                position: 'absolute',
+                top: 0-s.height
+            });
+            oLi.css({
+                display: 'block',
+                position: 'relative',
+                background: '#333',
+                border: 'none'
+            });
+
+            $('li>img,li>p',_this).css({
+                transform: 'rotate(90deg)',
+                '-webkit-transform': 'rotate(90deg)',
+                height: s.width,
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                margin: 'auto'
+            })
+
+            //$("img",_this).on('load',onImageLoad);
+            $("img",_this).each(function(index, el) {
+                var li = $(el).parents('li'),
+                    liWidth = li.width(),
+                    liHeight = li.height(),
+                    elWidth = $(el).width(),
+                    elHeight = $(el).height();
+
+                if(elWidth/elHeight > liWidth/liHeight){
+                    $(el).css({
+                        display: 'block'
+                    })
+                    // $(el).css({
+                    //     'margin-top': (liHeight - elHeight)/2 + 'px'
+                    // })
+                }
+                else(
+                    $(el).css({
+                        display: 'block'
+                    })
+                )
+            });
+
+            $("p",_this).each(function(index,el){
+                var li = $(el).parents('li'),
+                    liWidth = li.width(),
+                    liHeight = li.height(),
+                    elWidth = $(el).width(),
+                    elHeight = $(el).height();
+
+                $(el).css({
+                    display: 'block',
+                    width: liWidth,
+                    height: liHeight
+                    //'margin-top': (liHeight - elHeight)/2 + 'px'
+                })
+            });
+            
+            bindTochuEvent();
+            autoMove();
+
+            function autoMove(){
+                if(s.switcher){
+                    timer = setInterval(doMove, s.during);
+                }
+            }
+
+            function stopMove(){
+                clearInterval(timer);
+            }
+            
+            function doMove(){
+                iCurr = iCurr > num  ? 0 : iCurr + 1;
+                doAnimate(-moveHeight * iCurr,function(){
+                    if(iCurr == num + 1){
+                        iCurr = 1;
+                        oMover[0].style.top = -moveHeight +'px';
+                    }
+                });
+            }
+
+            function doAnimate(iTarget, fn){
+                oMover.animate({
+                    top: iTarget
+                }, _this.speed , function(){
+                    if (fn) 
+                        fn();
+                });
+            }
+
+            function onImageLoad(evt){
+                var img = $(evt.currentTarget),
+                    div = img.parent().parent;
+            }
+
+            function bindTochuEvent(){
+                oMover.get(0).addEventListener('touchstart', touchStartFunc, false);
+                oMover.get(0).addEventListener('touchmove', touchMoveFunc, false);
+                oMover.get(0).addEventListener('touchend', touchEndFunc, false);
+            }
+            
+            function touchStartFunc(e){
+                clearInterval(timer);
+                getTouchPosition(e);
+                startX = oPosition.x;
+                startY = oPosition.y;
+                temPos = oMover.position().left;
+            }
+            
+            function touchMoveFunc(e){
+                getTouchPosition(e);
+                var moveX = oPosition.x - startX;
+                var moveY = oPosition.y - startY;
+                if (Math.abs(moveY) < Math.abs(moveX)) {
+                    e.preventDefault();
+                    oMover.css({
+                        left: temPos + moveX
+                    });
+                }
+            }
+            
+            function touchEndFunc(e){
+                getTouchPosition(e);
+                var moveX = oPosition.x - startX;
+                var moveY = oPosition.y - startY;
+                if (Math.abs(moveX) < Math.abs(moveY)) {
+                    if (moveY > 0) {
+                        iCurr--;
+                        if (iCurr > 0 && iCurr <= num) {
+                            var moveY = iCurr * moveHeight;
+                            doAnimate(-moveY, autoMove);
+                        }
+                        else if(iCurr==0){
+                            doAnimate(0,function(){
+                                iCurr = num;
+                                oMover[0].style.top = -moveHeight * num +'px';
+                                autoMove();
+                            });
+                        }
+                        else if(iCurr == num + 1){
+                            doAnimate(-moveHeight * iCurr,function(){
+                                iCurr = 1;
+                                oMover[0].style.top = -moveHeight +'px';
+                                autoMove();
+                            });
+                        }
+                    }
+                    else {
+                        iCurr++;
+                        if (iCurr <= num && iCurr > 0) {
+                            var moveY = iCurr * moveHeight;
+                            doAnimate(-moveY, autoMove);
+                        }
+                        else if(iCurr==0){
+                            doAnimate(0,function(){
+                                iCurr = num;
+                                oMover[0].style.top = -moveHeight * num +'px';
+                                autoMove();
+                            });
+                        }
+                        else if(iCurr == num + 1){
+                            doAnimate(-moveHeight * iCurr,function(){
+                                iCurr = 1;
+                                oMover[0].style.top = -moveHeight +'px';
+                                autoMove();
+                            });
+                        }
+                    }
+                }
+            }
+            
+            function getTouchPosition(e){
+                var touches = e.changedTouches,
+                    l = touches.length,
+                    touch,
+                    tagX,
+                    tagY;
+                for (var i = 0; i < l; i++) {
+                    touch = touches[i];
+                    tagX = touch.clientX;
+                    tagY = touch.clientY;
+                }
+                oPosition.x = tagX;
+                oPosition.y = tagY;
+                return oPosition;
+            }
+        });
+    }
+
 })(Zepto);
