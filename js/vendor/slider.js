@@ -310,12 +310,6 @@
                 return;
             }
 
-            if(l==1){
-
-                _this.append("<img src="+ blocks[0] +">");
-                return;
-            }
-
             var oMover = $("<ul>").appendTo(_this);
 
             for(var i=0; i<l; i++){
@@ -329,13 +323,12 @@
             var num = lgh -2; //page number
 
             oLi.width(s.width).height(s.height);
-            oMover.width(s.width).height((lgh) * oLi.height());
+            oMover.width(s.width);
 
             oMover.css({
                 padding:0,
                 margin:0,
-                position: 'absolute',
-                top: 0-s.height
+                transform: 'translateY(-' + s.height + 'px)'
             });
             oLi.css({
                 display: 'block',
@@ -346,14 +339,7 @@
 
             $('li>img,li>p',_this).css({
                 transform: 'rotate(90deg)',
-                '-webkit-transform': 'rotate(90deg)',
-                height: s.width,
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-                margin: 'auto'
+                '-webkit-transform': 'rotate(90deg)'
             })
 
             //$("img",_this).on('load',onImageLoad);
@@ -366,11 +352,15 @@
 
                 if(elWidth/elHeight > liWidth/liHeight){
                     $(el).css({
-                        display: 'block'
+                        display: 'block',
+                        height: liWidth,
+                        position: 'absolute'
                     })
-                    // $(el).css({
-                    //     'margin-top': (liHeight - elHeight)/2 + 'px'
-                    // })
+
+                    $(el).css({
+                        top: (liHeight - $(el).width())/2 + 'px',
+                        left: -($(el).height() - $(el).width())/2 + 'px'
+                    })
                 }
                 else(
                     $(el).css({
@@ -388,9 +378,12 @@
 
                 $(el).css({
                     display: 'block',
-                    width: liWidth,
-                    height: liHeight
-                    //'margin-top': (liHeight - elHeight)/2 + 'px'
+                    width: liHeight - 20,
+                    height: liWidth - 20,
+                    padding: 10,
+                    position: 'absolute',
+                    top:(liHeight-liWidth)/2 + 'px',
+                    left: -(liHeight-liWidth)/2 + 'px'
                 })
             });
             
@@ -412,14 +405,14 @@
                 doAnimate(-moveHeight * iCurr,function(){
                     if(iCurr == num + 1){
                         iCurr = 1;
-                        oMover[0].style.top = -moveHeight +'px';
+                        oMover.css(transform,'translateY(-' + moveHeight + 'px)')
                     }
                 });
             }
 
             function doAnimate(iTarget, fn){
                 oMover.animate({
-                    top: iTarget
+                    transform: 'translateY(' + iTarget + 'px)'
                 }, _this.speed , function(){
                     if (fn) 
                         fn();
@@ -471,14 +464,14 @@
                         else if(iCurr==0){
                             doAnimate(0,function(){
                                 iCurr = num;
-                                oMover[0].style.top = -moveHeight * num +'px';
+                                oMover[0].style.transform = 'translateY(-' + moveHeight * num +'px)';
                                 autoMove();
                             });
                         }
                         else if(iCurr == num + 1){
                             doAnimate(-moveHeight * iCurr,function(){
                                 iCurr = 1;
-                                oMover[0].style.top = -moveHeight +'px';
+                                oMover[0].style.transform = 'translateY(-' + moveHeight +'px)';
                                 autoMove();
                             });
                         }
@@ -492,14 +485,14 @@
                         else if(iCurr==0){
                             doAnimate(0,function(){
                                 iCurr = num;
-                                oMover[0].style.top = -moveHeight * num +'px';
+                                oMover[0].style.transform = 'translateY(-' + moveHeight * num +'px)';
                                 autoMove();
                             });
                         }
                         else if(iCurr == num + 1){
                             doAnimate(-moveHeight * iCurr,function(){
                                 iCurr = 1;
-                                oMover[0].style.top = -moveHeight +'px';
+                                oMover[0].style.transform = 'translateY(-' + moveHeight +'px)';
                                 autoMove();
                             });
                         }

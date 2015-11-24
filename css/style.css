@@ -96,6 +96,14 @@ header .subtitle{
 	display: none;
 }
 
+.presentation ul{
+	overflow: hidden;
+}
+
+.presentation ul li{
+	overflow: hidden;
+}
+
 .text-shot p{
 	background-color: #000;
 }

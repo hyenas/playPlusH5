@@ -102,12 +102,13 @@ require(['Zepto','PP','slider'], function () {
         for(i=0; i<l; i++){
             if(data[i].content.type == 'image'){
                 slideLi = "<li><img src=" + data[i].content.pictureUrl + "></li>";
+                slideArr.push(slideLi);
             }
-            // else if(data[i].content.type == 'text'){
-            //     slideLi = "<li><p class='" + data[i].content.charStyle + "' style=\"text-align:" + data[i].content.alignment + ";\">" + data[i].content.text + "</p></li>"
-            // }
+            else if(data[i].content.type == 'text'){
+                slideLi = "<li><p class='" + data[i].content.charStyle + "' style=\"text-align:" + data[i].content.alignment + ";\">" + data[i].content.text + "</p></li>";
+                slideArr.push(slideLi);
+            }
 
-            slideArr.push(slideLi);
         }
 
         return slideArr;
