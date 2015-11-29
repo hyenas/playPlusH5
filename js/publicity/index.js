@@ -305,7 +305,7 @@ require(['Zepto','PP','slider'], function () {
 
             if(shotType == 'image'){
                 shotImg = $('<img>',{src:shot.content.pictureUrl});
-                shotBlock = $('<div>',{class:'img-shot'});
+                shotBlock = $('<div>',{class:'img-shot','data-idx':i});
                  
                 shotBlock.css({
                     width: (shot.size.colSpan - 10/rem) + 'rem',
@@ -330,7 +330,7 @@ require(['Zepto','PP','slider'], function () {
             }
             else if(shotType == 'text'){
                 shotText = $('<p>',{class:shot.content.charStyle}).text(shot.content.text);
-                shotBlock = $('<div>',{class:'text-shot'});
+                shotBlock = $('<div>',{class:'text-shot','data-idx':i});
                 shotBlock.css({
                     "text-align": shot.content.alignment,
                     top: me.caculateTextPosition()
@@ -386,7 +386,8 @@ require(['Zepto','PP','slider'], function () {
     }
 
     work.bindtTransform = function() {
-        $('#shotsDiv').on('click','div',function(){
+        $('#shotsDiv').on('click','div',function(event){
+            var currentIndex = $(event.currentTarget).data('idx');
             $('.stream').hide();
             $('.presentation').css({
                 display: "block",
@@ -401,6 +402,7 @@ require(['Zepto','PP','slider'], function () {
                 during: 3000,
                 speed: 100
             })
+
         })
     };
 

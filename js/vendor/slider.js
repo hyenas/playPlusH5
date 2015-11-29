@@ -328,7 +328,7 @@
             oMover.css({
                 padding:0,
                 margin:0,
-                transform: 'translateY(-' + s.height + 'px)'
+                '-webkit-transform': 'translateY(-' + s.height + 'px)'
             });
             oLi.css({
                 display: 'block',
@@ -405,14 +405,14 @@
                 doAnimate(-moveHeight * iCurr,function(){
                     if(iCurr == num + 1){
                         iCurr = 1;
-                        oMover.css(transform,'translateY(-' + moveHeight + 'px)')
+                        oMover.css('-webkit-transform','translateY(-' + moveHeight + 'px)')
                     }
                 });
             }
 
             function doAnimate(iTarget, fn){
                 oMover.animate({
-                    transform: 'translateY(' + iTarget + 'px)'
+                    '-webkit-transform': 'translateY(' + iTarget + 'px)'
                 }, _this.speed , function(){
                     if (fn) 
                         fn();
@@ -464,14 +464,14 @@
                         else if(iCurr==0){
                             doAnimate(0,function(){
                                 iCurr = num;
-                                oMover[0].style.transform = 'translateY(-' + moveHeight * num +'px)';
+                                oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight * num +'px)';
                                 autoMove();
                             });
                         }
                         else if(iCurr == num + 1){
                             doAnimate(-moveHeight * iCurr,function(){
                                 iCurr = 1;
-                                oMover[0].style.transform = 'translateY(-' + moveHeight +'px)';
+                                oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight +'px)';
                                 autoMove();
                             });
                         }
@@ -485,14 +485,14 @@
                         else if(iCurr==0){
                             doAnimate(0,function(){
                                 iCurr = num;
-                                oMover[0].style.transform = 'translateY(-' + moveHeight * num +'px)';
+                                oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight * num +'px)';
                                 autoMove();
                             });
                         }
                         else if(iCurr == num + 1){
                             doAnimate(-moveHeight * iCurr,function(){
                                 iCurr = 1;
-                                oMover[0].style.transform = 'translateY(-' + moveHeight +'px)';
+                                oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight +'px)';
                                 autoMove();
                             });
                         }
