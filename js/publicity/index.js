@@ -220,7 +220,7 @@ require(['Zepto','PP','slider'], function () {
             left: -left +'px',
             width: scaleX * 10000 + '%',
             height: scaleY  * 10000+ '%',
-            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
+            clip: 'rect('+ top + 'px,' + (right+1) + 'px,' + (bottom +1)+ 'px,' + left + 'px)'
         })
 
         $('span.loading',div).hide();
@@ -308,8 +308,8 @@ require(['Zepto','PP','slider'], function () {
                 shotBlock = $('<div>',{class:'img-shot','data-idx':i});
                  
                 shotBlock.css({
-                    width: (shot.size.colSpan - 10/rem) + 'rem',
-                    height: (shot.size.rowSpan - 10/rem) + 'rem',
+                    width: (shot.size.colSpan - 6/rem) + 'rem',
+                    height: (shot.size.rowSpan - 6/rem) + 'rem',
                     top: (shot.position.rowIndex+me.textHeight) + 'rem',
                     left: shot.position.colIndex + 'rem'
                 })
@@ -333,23 +333,24 @@ require(['Zepto','PP','slider'], function () {
                 shotBlock = $('<div>',{class:'text-shot','data-idx':i});
                 shotBlock.css({
                     "text-align": shot.content.alignment,
-                    top: me.caculateTextPosition()
+                    top: me.caculateTextPosition() + 3,
+                    margin: '10px'
 
                 })
                 
                 shotBlock.append(shotText);
                 shotsDiv.append(shotBlock);
-                me.textHeight = me.textHeight + shotBlock.height()/rem - shot.size.rowSpan;
+                me.textHeight = me.textHeight + (shotBlock.height()+20)/rem - shot.size.rowSpan;
             }
         }
 
         var offsetDiv = $("<div class='offset'><div>")
         offsetDiv.css({
             width: '100%',
-            height: '.8rem',
+            height: '.88rem',
             top: me.caculateTextPosition(),
             left:0,
-            margin:'5px 0 0 0'
+            margin:'6px 0 0 0'
         })
         shotsDiv.append(offsetDiv);
         $('body').css('background-color', '#000');
@@ -400,7 +401,8 @@ require(['Zepto','PP','slider'], function () {
                 width: $(window).width(),
                 height: $(window).height(),
                 during: 3000,
-                speed: 100
+                speed: 100,
+                index: currentIndex + 1
             })
 
         })

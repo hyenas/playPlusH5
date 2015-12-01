@@ -22,7 +22,7 @@
             height: $(window).width() * 0.47, //container height
             switcher: false, //switcher
             during: 5000, //interval
-            speed:30 //slide speed
+            speed: 30 //slide speed
         }
 
         settings = $.extend(true, {}, defaultSettings, settings);
@@ -32,11 +32,12 @@
             var _this = $(this), s = settings;
             var startX = 0, startY = 0;
             var temPos; //temp position
-            var iCurr = 1; //current page
             var timer = null; // timer handle
             var oPosition = {}; //touch position
             var moveWidth = s.width; //move width
             var oriWidth = $(window).width();
+
+            window.iCurr = iCurr ? iCurr : 1; //current page
 
             //init container style
             _this.width(s.width).height(s.height).css({
@@ -78,7 +79,7 @@
                 padding:0,
                 margin:0,
                 position: 'absolute',
-                left: 0-s.width
+                left: 0-s.width * iCurr
             });
             oLi.css({
                 float: 'left',
@@ -279,7 +280,8 @@
             height: $(window).width() * 0.47, //container height
             switcher: false, //switcher
             during: 5000, //interval
-            speed:30 //slide speed
+            speed:30, //slide speed
+            index: 0 //slide index
         }
 
         settings = $.extend(true, {}, defaultSettings, settings);
@@ -289,11 +291,12 @@
             var _this = $(this), s = settings;
             var startX = 0, startY = 0;
             var temPos; //temp position
-            var iCurr = 1; //current page
             var timer = null; // timer handle
             var oPosition = {}; //touch position
             var moveHeight = s.height; //move width
             var oriWidth = $(window).width();
+
+            window.iCurr = s.index + 1; //current page
 
             //init container style
             _this.width(s.width).height(s.height).css({
@@ -328,7 +331,7 @@
             oMover.css({
                 padding:0,
                 margin:0,
-                '-webkit-transform': 'translateY(-' + s.height + 'px)'
+                '-webkit-transform': 'translateY(-' + s.height * iCurr + 'px)'
             });
             oLi.css({
                 display: 'block',
