@@ -9,7 +9,8 @@ require.config({
     baseUrl: 'js/vendor/',
     paths: {
         'Zepto': 'zepto.min',
-        'PP': 'PP'
+        'PP': 'PP',
+        'slider': 'slider'
     },
     shim: {
         'Zepto': {
@@ -18,30 +19,29 @@ require.config({
         'PP': {
             deps: ['Zepto']
         },
+        'slider': {
+            deps: ['Zepto']
+        }
     }
 });
 
-require(['Zepto','PP'], function () {
+require(['Zepto','PP','slider'], function () {
+    //setTimeout(window.scrollTo(0, 0), 1);
     var work = {};
     work.data = {};
+    work.isSlideRender = false;
+    work.presentationHeight = $(window).width();
 
     work.init = function(){
         //define global variable
-        // offline this._URL = 'http://120.55.148.102/v1.0/shares/works/';
+        // this._URL = 'http://test.api.playplus.me/v1.0/shares/works/';
         this._URL = 'http://api.playplus.me/v1.0/shares/works/';
         this.textHeight = 0;
         this.mask = "<span class='loading'><span>";
-        function onResize(){
-            work.textHeight = 0;
-            work.callback(work.data);
-            // if(window.orientation==180||window.orientation==0){
-                // alert("竖屏状态！")
-            // }
-            // if(window.orientation==90||window.orientation==-90){
-                // alert("横屏状态！")
-            // }
-        }
-        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", onResize, false);
+        
+        window.addEventListener("orientationchange" in window ? "orientationchange" : "resize", work.onResize, false);
+
+        work.bindtTransform();
     };
 
     work.action = function(){
@@ -70,7 +70,7 @@ require(['Zepto','PP'], function () {
     work.callback = function(mockData){
         var me = this;
         //auto adaptation, calculate rem, if failed then default will be 50px
-        PP.setREM(mockData.pictureStory.layout.cols);
+        PP.setREM(mockData.story.layout.cols);
 
         //update title
         if(mockData.title){
@@ -86,10 +86,38 @@ require(['Zepto','PP'], function () {
             }
         }
 
-        $('header div.mask').show();
-        $('.loadApp').show();
+        $('header div.mask').css('display','block')
+        $('.loadApp').css('display','block');
         me.renderCover(mockData);
-        me.renderShots(mockData.pictureStory.shots);
+        me.renderShots(mockData.story.shots);
+    };
+
+    work.assemblySlider = function(data){
+        var i,
+            l = data.length,
+            slideArr = [],
+            textBlock,
+            slideLi;
+
+        for(i=0; i<l; i++){
+            if(data[i].content.type == 'image'){
+                slideLi = "<li><img src=" + data[i].content.pictureUrl + "></li>";
+                slideArr.push(slideLi);
+            }
+            else if(data[i].content.type == 'text'){
+                slideLi = "<li><p class='" + data[i].content.charStyle + "' style=\"text-align:" + data[i].content.alignment + ";\">" + data[i].content.text + "</p></li>";
+                slideArr.push(slideLi);
+            }
+
+        }
+
+        return slideArr;
+    };  
+
+    work.moveSlider = function(index){
+        $('ul',$(".presentation")).css({
+            left: '-' + index * $(window).width()
+        })
     };
 
     //lazy load
@@ -192,7 +220,7 @@ require(['Zepto','PP'], function () {
             left: -left +'px',
             width: scaleX * 10000 + '%',
             height: scaleY  * 10000+ '%',
-            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
+            clip: 'rect('+ top + 'px,' + (right+1) + 'px,' + (bottom +1)+ 'px,' + left + 'px)'
         })
 
         $('span.loading',div).hide();
@@ -219,7 +247,7 @@ require(['Zepto','PP'], function () {
             clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
         })
         //$('span.loading').hide();
-        img.show();
+        img.css('display','block');
     };
 
     work.hideLoading = function(evt){
@@ -236,10 +264,10 @@ require(['Zepto','PP'], function () {
         var me=this,
             banner = $('header .banner'),
             text = $('header div.title'),
-            coverImg = $('<img>',{src: mockData.pictureStory.cover.pictureUrl}),
+            coverImg = $('<img>',{src: mockData.story.cover.pictureUrl}),
             title = $('<p>',{class:'title'}).text(mockData.title),
             subtitle = $('<p>',{class:'subtitle'}).text(mockData.subtitle),
-            cover=mockData.pictureStory.cover;
+            cover=mockData.story.cover;
 
         $("header div").empty();
 
@@ -254,15 +282,6 @@ require(['Zepto','PP'], function () {
         else{
             coverImg.on('load',me.centerCrop);
         }
-        // else if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct == -1){
-        //     coverImg.on('load',me.centerCrop);
-        // }
-        // else{
-        //     coverImg.css({
-        //         width: "100%",
-        //         height: "100%"
-        //     });
-        // }
     };
 
     //render shots
@@ -286,11 +305,11 @@ require(['Zepto','PP'], function () {
 
             if(shotType == 'image'){
                 shotImg = $('<img>',{src:shot.content.pictureUrl});
-                shotBlock = $('<div>',{class:'img-shot'});
+                shotBlock = $('<div>',{class:'img-shot','data-idx':i});
                  
                 shotBlock.css({
-                    width: (shot.size.colSpan - 10/rem) + 'rem',
-                    height: (shot.size.rowSpan - 10/rem) + 'rem',
+                    width: (shot.size.colSpan - 6/rem) + 'rem',
+                    height: (shot.size.rowSpan - 6/rem) + 'rem',
                     top: (shot.position.rowIndex+me.textHeight) + 'rem',
                     left: shot.position.colIndex + 'rem'
                 })
@@ -308,41 +327,85 @@ require(['Zepto','PP'], function () {
                     //shotImg.data('area',shot.size);
                     shotImg.on('load',me.centerCrop);
                 }
-                // else if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct == -1){
-                //     shotImg.data('area',shot.size);
-                //     shotImg.on('load',me.centerCrop);
-                // }
-                // else{
-                //     shotImg.css({
-                //         width: "100%",
-                //         height: "100%"
-                //     });
-                // }
             }
             else if(shotType == 'text'){
                 shotText = $('<p>',{class:shot.content.charStyle}).text(shot.content.text);
-                shotBlock = $('<div>',{class:'text-shot'});
+                shotBlock = $('<div>',{class:'text-shot','data-idx':i});
                 shotBlock.css({
                     "text-align": shot.content.alignment,
-                    top: me.caculateTextPosition()
+                    top: me.caculateTextPosition() + 3,
+                    margin: '10px'
 
                 })
                 
                 shotBlock.append(shotText);
                 shotsDiv.append(shotBlock);
-                me.textHeight = me.textHeight + shotBlock.height()/rem - shot.size.rowSpan;
+                me.textHeight = me.textHeight + (shotBlock.height()+20)/rem - shot.size.rowSpan;
             }
         }
 
         var offsetDiv = $("<div class='offset'><div>")
         offsetDiv.css({
             width: '100%',
-            height: '.8rem',
+            height: '.88rem',
             top: me.caculateTextPosition(),
             left:0,
-            margin:'5px 0 0 0'
+            margin:'6px 0 0 0'
         })
         shotsDiv.append(offsetDiv);
+        $('body').css('background-color', '#000');
+    };
+
+    work.onResize = function(){
+        if($(window).width() < $(window).height()){
+            $('.stream').css("display","block");
+            $('.presentation').hide();
+            $('body').css({
+                'overflow': 'scroll'
+            })
+            work.presentationHeight = $(window).width();
+            work.textHeight = 0;
+            work.callback(work.data);
+        }
+        else{
+            $('.stream').hide();
+            $('.presentation').css({
+                display:'block'
+            });
+
+           $(".presentation").empty();
+           
+           $(".presentation").mobileSlider({
+                blocks: work.assemblySlider(work.data.presentation.slides),
+                width: $(window).width(),
+                height: $(window).height(),
+                during: 3000,
+                speed: 100
+            })
+
+        }
+    }
+
+    work.bindtTransform = function() {
+        $('#shotsDiv').on('click','div',function(event){
+            var currentIndex = $(event.currentTarget).data('idx');
+            $('.stream').hide();
+            $('.presentation').css({
+                display: "block",
+            });
+            
+            $(".presentation").empty();
+
+            $(".presentation").carousel({
+                blocks: work.assemblySlider(work.data.presentation.slides),
+                width: $(window).width(),
+                height: $(window).height(),
+                during: 3000,
+                speed: 100,
+                index: currentIndex + 1
+            })
+
+        })
     };
 
     $(function(){

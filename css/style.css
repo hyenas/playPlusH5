@@ -1,6 +1,3 @@
-/**{
-	background-color: #ddd;
-}*/
 
 header{
 	position: relative;
@@ -33,6 +30,7 @@ header div.banner{
 	top: 0;
 	width: 6rem;
 	height: 6rem;
+	background-color: #fff;
 }
 
 header img{
@@ -64,6 +62,7 @@ header .subtitle{
 }
 
 #shotsDiv{
+	margin-top: 3px;
 	position: relative;
 
 }
@@ -71,8 +70,17 @@ header .subtitle{
 #shotsDiv div{
 	box-sizing: border-box;
 	position: absolute;
-	margin: 5px;
+	margin: 3px;
 	overflow: hidden;
+	background-color: #fff;
+}
+
+#shotsDiv .text-shot{
+	margin: 10px;
+}
+
+#shotsDiv .offset{
+	background-color: #000;
 }
 
 #shotsDiv img{
@@ -89,19 +97,38 @@ header .subtitle{
 	background:url(../img/loading.gif) no-repeat center center;
 }
 
-.text-shot .header{
+.presentation{
+	display: none;
+}
+
+.presentation ul{
+	overflow: hidden;
+}
+
+.presentation ul li{
+	overflow: hidden;
+}
+
+.text-shot p{
+	background-color: #000;
+}
+
+.text-shot .header,.presentation .header{
+	color: #fff; 
 	line-height: 28px;
 	font-size: 22px;
 	font-family: Helvetica;
 }
 
-.text-shot .quote{
+.text-shot .quote,.presentation .quote{
+	color: #fff; 
 	line-height: 34px;
 	font-size: 28px;
 	font-family: AvenirNextCondensed-UltraLightItalic;
 }
 
-.text-shot .normal{
+.text-shot .normal,.presentation .normal{
+	color: #fff; 
 	line-height: 22px;
 	font-size: 16px;
 	font-family: Baskerville;
@@ -111,44 +138,59 @@ header .subtitle{
 	display: none;
  	position: fixed;
  	bottom: 0;
- 	height: .8rem;
+ 	height: .88rem;
  	width: 100%;
- 	background-color: rgba(0,0,0,0.8);
+ 	background-color: rgba(50,50,50,0.7);
  	color: #fff;
 }
 
-.description {
-	display: inline-block;
+#play img {
 	position: absolute;
-	top: .2rem;
-	left: .3rem;
-	width: 4rem;
-	font-size: .25rem;
+	height: .5rem;
+	top: .19rem;
+	left: .9rem;
 }
 
-.description .app-name a{
+#logo img {
+	position: absolute;
+	height: .5rem;
+	top: .19rem;
+	left: .3rem;
+}
+
+#description {
+	display: inline-block;
+	position: absolute;
+	top: .34rem;
+	left: 2.6rem;
+	font-size: .2rem;
+}
+
+#description .app-name a{
 	font-size: .3rem;
 	color: #00CCCC;
 	text-decoration: none;
 }
 
-.loadBtn {
+#loadBtn {
 	display: inline-block;
 	position: absolute;
-	top:.15rem;
+	top:.2rem;
 	right: .3rem;
-	height: .6rem;
 }
 
-.loadBtn div {
-	background-color: #ff2d55;
+#loadBtn div {
 	text-align: center;
-	font-size: .3rem;
-	padding: .1rem;
-	border-radius: .03rem;
+	padding: .05rem;
+	border-radius: .1rem;
+	border: 2px solid #02c4fd;;
+	width: 1rem;
+	height: .3rem;
+	font-size: .22rem;
 }
 
-.loadBtn a{
+#loadBtn a{
 	color: #fff;
 	text-decoration: none;
+	line-height: .3rem;
 }
