@@ -22,7 +22,7 @@
             height: $(window).width() * 0.47, //container height
             switcher: false, //switcher
             during: 5000, //interval
-            speed: 30 //slide speed
+            speed: 300 //slide speed
         }
 
         settings = $.extend(true, {}, defaultSettings, settings);
@@ -155,7 +155,7 @@
             function doAnimate(iTarget, fn){
                 oMover.animate({
                     left: iTarget
-                }, _this.speed , function(){
+                }, s.speed , function(){
                     if (fn) 
                         fn();
                 });
@@ -329,9 +329,7 @@
             oMover.width(s.width);
 
             oMover.css({
-                padding:0,
-                margin:0,
-                '-webkit-transform': 'translateY(-' + s.height * iCurr + 'px)'
+                '-webkit-transform': 'translateY(-' + s.height * iCurr + 'px) translateZ(0)'
             });
             oLi.css({
                 display: 'block',
@@ -391,36 +389,21 @@
             });
             
             bindTochuEvent();
-            autoMove();
-
-            function autoMove(){
-                if(s.switcher){
-                    timer = setInterval(doMove, s.during);
-                }
-            }
 
             function stopMove(){
                 clearInterval(timer);
             }
-            
-            function doMove(){
-                iCurr = iCurr > num  ? 0 : iCurr + 1;
-                doAnimate(-moveHeight * iCurr,function(){
-                    if(iCurr == num + 1){
-                        iCurr = 1;
-                        oMover.css('-webkit-transform','translateY(-' + moveHeight + 'px)')
-                    }
-                });
-            }
+    
 
             function doAnimate(iTarget, fn){
                 oMover.animate({
                     '-webkit-transform': 'translateY(' + iTarget + 'px)'
-                }, _this.speed , function(){
+                }, s.speed , function(){
                     if (fn) 
                         fn();
                 });
             }
+
 
             function onImageLoad(evt){
                 var img = $(evt.currentTarget),
@@ -435,26 +418,28 @@
             
             function touchStartFunc(e){
                 clearInterval(timer);
+                //oMover.removeClass('carousel-transition');
                 getTouchPosition(e);
                 startX = oPosition.x;
                 startY = oPosition.y;
-                temPos = oMover.position().left;
+                temPos = parseInt(oMover.css('-webkit-transform').match(/\d+/g)[0]);
             }
             
             function touchMoveFunc(e){
                 getTouchPosition(e);
                 var moveX = oPosition.x - startX;
                 var moveY = oPosition.y - startY;
-                if (Math.abs(moveY) < Math.abs(moveX)) {
+                if (Math.abs(moveY) > Math.abs(moveX)) {
                     e.preventDefault();
                     oMover.css({
-                        left: temPos + moveX
+                        '-webkit-transform': 'translateY(-' + (temPos - moveY) +'px)'
                     });
                 }
             }
             
             function touchEndFunc(e){
                 getTouchPosition(e);
+                //oMover.addClass('carousel-transition');
                 var moveX = oPosition.x - startX;
                 var moveY = oPosition.y - startY;
                 if (Math.abs(moveX) < Math.abs(moveY)) {
@@ -462,20 +447,18 @@
                         iCurr--;
                         if (iCurr > 0 && iCurr <= num) {
                             var moveY = iCurr * moveHeight;
-                            doAnimate(-moveY, autoMove);
+                            doAnimate(-moveY);
                         }
                         else if(iCurr==0){
                             doAnimate(0,function(){
                                 iCurr = num;
                                 oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight * num +'px)';
-                                autoMove();
                             });
                         }
                         else if(iCurr == num + 1){
                             doAnimate(-moveHeight * iCurr,function(){
                                 iCurr = 1;
                                 oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight +'px)';
-                                autoMove();
                             });
                         }
                     }
@@ -483,20 +466,18 @@
                         iCurr++;
                         if (iCurr <= num && iCurr > 0) {
                             var moveY = iCurr * moveHeight;
-                            doAnimate(-moveY, autoMove);
+                            doAnimate(-moveY);
                         }
                         else if(iCurr==0){
                             doAnimate(0,function(){
                                 iCurr = num;
                                 oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight * num +'px)';
-                                autoMove();
                             });
                         }
                         else if(iCurr == num + 1){
                             doAnimate(-moveHeight * iCurr,function(){
                                 iCurr = 1;
                                 oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight +'px)';
-                                autoMove();
                             });
                         }
                     }

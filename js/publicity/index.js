@@ -380,7 +380,7 @@ require(['Zepto','PP','slider'], function () {
                 width: $(window).width(),
                 height: $(window).height(),
                 during: 3000,
-                speed: 100
+                speed: 300
             })
 
         }
@@ -401,7 +401,7 @@ require(['Zepto','PP','slider'], function () {
                 width: $(window).width(),
                 height: $(window).height(),
                 during: 3000,
-                speed: 100,
+                speed: 300,
                 index: currentIndex + 1
             })
 
