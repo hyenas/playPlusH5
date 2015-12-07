@@ -35,7 +35,7 @@ require(['Zepto','PP','slider'], function () {
     work.init = function(){
         //define global variable
         // online this._URL = 'http://api.playplus.me/v1.0/shares/works/';
-        this._URL = 'http://test.api.playplus.me/v1.0/shares/works/';
+        this._URL = 'http://test.www.playplus.me/shares/works/';
         this.textHeight = 0;
         this.mask = "<span class='loading'><span>";
         
@@ -51,7 +51,7 @@ require(['Zepto','PP','slider'], function () {
             type: 'GET',
             dataType: 'json',
             headers:{
-                'X-Request-ID': PP.getUUID()
+                'X-Request-ID': PP.getUUID(),
             },
             url: me._URL + PP.getURLParam('workId'),
             jsonpCallback:'jsonp1',
@@ -261,13 +261,22 @@ require(['Zepto','PP','slider'], function () {
 
     //render the header
     work.renderCover = function(mockData){
-        var me=this,
-            banner = $('header .banner'),
-            text = $('header div.title'),
-            coverImg = $('<img>',{src: mockData.story.cover.pictureUrl}),
-            title = $('<p>',{class:'title'}).text(mockData.title),
-            subtitle = $('<p>',{class:'subtitle'}).text(mockData.subtitle),
-            cover=mockData.story.cover;
+        var me=this;
+        var banner = $('header .banner');
+        var text = $('header div.title');
+        var title = $('<p>',{class:'title'}).text(mockData.title);
+        var subtitle = $('<p>',{class:'subtitle'}).text(mockData.subtitle);
+        var cover=mockData.story.cover;
+
+        var coverImg = $('<img>',{src: mockData.story.cover.pictureUrl});
+        if (mockData.story.cover.content.type == 'video') {
+            coverImg = $('<img>',{src: mockData.story.cover.content.coverFile.url+"/cm480x"});
+        }
+
+        if (mockData.story.cover.content.type == 'image') {
+            coverImg = $('<img>',{src: mockData.story.cover.content.bodyFile.url+"/cm480x"});
+        }
+
 
         $("header div").empty();
 
@@ -286,16 +295,16 @@ require(['Zepto','PP','slider'], function () {
 
     //render shots
     work.renderShots = function(shots){
-        var i,
-            shot,
-            shotType,
-            length = shots.length,
-            shotsDiv = $('#shotsDiv'),
-            shotBlock,
-            shotImg,
-            shotText,
-            rem = parseInt(document.documentElement.style.fontSize),
-            me = this;
+        var i;
+        var shot;
+        var shotType;
+        var length = shots.length;
+        var shotsDiv = $('#shotsDiv');
+        var shotBlock;
+        var shotImg;
+        var shotText;
+        var rem = parseInt(document.documentElement.style.fontSize);
+        var me = this;
 
         $("#shotsDiv").empty();
 
@@ -303,8 +312,13 @@ require(['Zepto','PP','slider'], function () {
             shot = shots[i];
             shotType = shot.content.type;
 
-            if(shotType == 'image'){
-                shotImg = $('<img>',{src:shot.content.pictureUrl});
+            if(shotType == 'image' || shotType == 'video'){
+                if (shotType == 'image') {
+                    shotImg = $('<img>',{src:shot.content.bodyFile.url});
+                } 
+                if (shotType == 'video') {
+                    shotImg = $('<img>',{src:shot.content.coverFile.url});
+                }
                 shotBlock = $('<div>',{class:'img-shot','data-idx':i});
                  
                 shotBlock.css({
@@ -328,7 +342,8 @@ require(['Zepto','PP','slider'], function () {
                     shotImg.on('load',me.centerCrop);
                 }
             }
-            else if(shotType == 'text'){
+
+            if(shotType == 'text'){
                 shotText = $('<p>',{class:shot.content.charStyle}).text(shot.content.text);
                 shotBlock = $('<div>',{class:'text-shot','data-idx':i});
                 shotBlock.css({
