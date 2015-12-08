@@ -272,7 +272,7 @@ require(['Zepto','PP','slider'], function () {
 
         var coverImg = $('<img>',{src: mockData.story.cover.pictureUrl});
         if (mockData.story.cover.content.type == 'video') {
-            coverImg = $('<img>',{src: mockData.story.cover.content.coverFile.url+"/cm480x"});
+            coverImg = $('<video loop muted>',{src: mockData.story.cover.content.bodyFile.url});
         }
 
         if (mockData.story.cover.content.type == 'image') {
@@ -319,7 +319,7 @@ require(['Zepto','PP','slider'], function () {
                     shotImg = $('<img>',{src:shot.content.bodyFile.url});
                 } 
                 if (shotType == 'video') {
-                    shotImg = $('<img>',{src:shot.content.coverFile.url});
+                    shotImg = $('<video loop muted>',{src:shot.content.bodyFile.url});
                 }
                 shotBlock = $('<div>',{class:'img-shot','data-idx':i});
                  
