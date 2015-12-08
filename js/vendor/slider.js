@@ -103,9 +103,9 @@
                         display: 'block',
                         width: '100%'
                     })
-                    // $(el).css({
-                    //     'margin-top': (liHeight - elHeight)/2 + 'px'
-                    // })
+                    $(el).css({
+                        'margin-top': (liHeight * elWidth / liWidth - elHeight)/2 + 'px'
+                    })
                 }
                 else(
                     $(el).css({
@@ -197,10 +197,10 @@
                 var moveX = oPosition.x - startX;
                 var moveY = oPosition.y - startY;
                 if (Math.abs(moveY) < Math.abs(moveX)) {
-                    if (moveX > 0) {
+                    if (moveX > 80) {
                         iCurr--;
                         if (iCurr > 0 && iCurr <= num) {
-                            var moveX = iCurr * moveWidth;
+                            moveX = iCurr * moveWidth;
                             doAnimate(-moveX, autoMove);
                         }
                         else if(iCurr==0){
@@ -218,10 +218,10 @@
                             });
                         }
                     }
-                    else {
+                    else if(moveX < -80){
                         iCurr++;
                         if (iCurr <= num && iCurr > 0) {
-                            var moveX = iCurr * moveWidth;
+                            moveX = iCurr * moveWidth;
                             doAnimate(-moveX, autoMove);
                         }
                         else if(iCurr==0){
@@ -238,6 +238,10 @@
                                 autoMove();
                             });
                         }
+                    }
+                    else{
+                        moveX = iCurr * moveWidth;
+                        doAnimate(-moveX);
                     }
                 }
             }
@@ -363,11 +367,17 @@
                         left: -($(el).height() - $(el).width())/2 + 'px'
                     })
                 }
-                else(
+                else{
                     $(el).css({
-                        display: 'block'
+                        display: 'block',
+                        position: 'absolute',
+                        width: liHeight
                     })
-                )
+                    $(el).css({
+                        top: (liHeight - $(el).width())/2 + 'px',
+                        left: -($(el).height() - $(el).width())/2 + (liWidth - $(el).width())/2 + 'px'
+                    })
+                }
             });
 
             $("p",_this).each(function(index,el){
@@ -380,10 +390,9 @@
                 $(el).css({
                     display: 'block',
                     width: liHeight - 20,
-                    height: liWidth - 20,
                     padding: 10,
                     position: 'absolute',
-                    top:(liHeight-liWidth)/2 + 'px',
+                    top:(liHeight-elWidth)/2 - 30 + 'px',
                     left: -(liHeight-liWidth)/2 + 'px'
                 })
             });
@@ -443,7 +452,7 @@
                 var moveX = oPosition.x - startX;
                 var moveY = oPosition.y - startY;
                 if (Math.abs(moveX) < Math.abs(moveY)) {
-                    if (moveY > 0) {
+                    if (moveY > 80) {
                         iCurr--;
                         if (iCurr > 0 && iCurr <= num) {
                             var moveY = iCurr * moveHeight;
@@ -462,7 +471,7 @@
                             });
                         }
                     }
-                    else {
+                    else if(moveY < -80){
                         iCurr++;
                         if (iCurr <= num && iCurr > 0) {
                             var moveY = iCurr * moveHeight;
@@ -480,6 +489,10 @@
                                 oMover[0].style['-webkit-transform'] = 'translateY(-' + moveHeight +'px)';
                             });
                         }
+                    }
+                    else{
+                        var moveY = iCurr * moveHeight;
+                        doAnimate(-moveY);
                     }
                 }
             }

@@ -101,7 +101,7 @@ require(['Zepto','PP','slider'], function () {
 
         for(i=0; i<l; i++){
             if(data[i].content.type == 'image'){
-                slideLi = "<li><img src=" + data[i].content.pictureUrl + "></li>";
+                slideLi = "<li><img src=" + data[i].content.bodyFile.url+"/cm480x" + "></li>";
                 slideArr.push(slideLi);
             }
             else if(data[i].content.type == 'text'){
@@ -220,10 +220,11 @@ require(['Zepto','PP','slider'], function () {
             left: -left +'px',
             width: scaleX * 10000 + '%',
             height: scaleY  * 10000+ '%',
-            clip: 'rect('+ top + 'px,' + (right+1) + 'px,' + (bottom +1)+ 'px,' + left + 'px)'
+            clip: 'rect('+ top + 'px,' + right + 'px,' + bottom + 'px,' + left + 'px)'
         })
 
         $('span.loading',div).hide();
+        div.css('background-color','#000');
     };
 
     work.clipImage = function (img,area) {
@@ -257,6 +258,7 @@ require(['Zepto','PP','slider'], function () {
             visibility:'visible'
         });
         $('.loading',div).hide();
+        div.css('background-color','#000');
     }
 
     //render the header
