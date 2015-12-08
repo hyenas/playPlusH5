@@ -61,6 +61,12 @@ header .subtitle{
 	font-size: 17px;
 }
 
+video {
+    width: 230px;
+    height: 300px;
+    object-fit: cover;
+}
+
 #shotsDiv{
 	margin-top: 3px;
 	position: relative;
