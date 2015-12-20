@@ -22,7 +22,8 @@
             height: $(window).width() * 0.47, //container height
             switcher: false, //switcher
             during: 5000, //interval
-            speed: 300 //slide speed
+            speed: 300, //slide speed
+            index: window.iCurr ? window.iCurr : 1 //slide index
         }
 
         settings = $.extend(true, {}, defaultSettings, settings);
@@ -37,7 +38,7 @@
             var moveWidth = s.width; //move width
             var oriWidth = $(window).width();
 
-            window.iCurr = iCurr ? iCurr : 1; //current page
+            window.iCurr = s.index; //current page
 
             //init container style
             _this.width(s.width).height(s.height).css({
@@ -285,7 +286,7 @@
             switcher: false, //switcher
             during: 5000, //interval
             speed:30, //slide speed
-            index: 0 //slide index
+            index: window.iCurr ? window.iCurr : 1 //slide index
         }
 
         settings = $.extend(true, {}, defaultSettings, settings);
@@ -300,7 +301,7 @@
             var moveHeight = s.height; //move width
             var oriWidth = $(window).width();
 
-            window.iCurr = s.index + 1; //current page
+            window.iCurr = s.index; //current page
 
             //init container style
             _this.width(s.width).height(s.height).css({
@@ -355,7 +356,19 @@
                     elWidth = $(el).width(),
                     elHeight = $(el).height();
 
-                if(elWidth/elHeight > liWidth/liHeight){
+                if(elWidth/elHeight < liWidth/liHeight){
+                    $(el).css({
+                        display: 'block',
+                        position: 'absolute',
+                        width: liHeight
+                    })
+                    $(el).css({
+                        top: (liHeight - $(el).width())/2 + 'px',
+                        left: -($(el).height() - $(el).width())/2 + (liWidth - $(el).width())/2 + 'px'
+                    })
+                    
+                }
+                else{
                     $(el).css({
                         display: 'block',
                         height: liWidth,
@@ -365,17 +378,6 @@
                     $(el).css({
                         top: (liHeight - $(el).width())/2 + 'px',
                         left: -($(el).height() - $(el).width())/2 + 'px'
-                    })
-                }
-                else{
-                    $(el).css({
-                        display: 'block',
-                        position: 'absolute',
-                        width: liHeight
-                    })
-                    $(el).css({
-                        top: (liHeight - $(el).width())/2 + 'px',
-                        left: -($(el).height() - $(el).width())/2 + (liWidth - $(el).width())/2 + 'px'
                     })
                 }
             });
@@ -389,10 +391,9 @@
 
                 $(el).css({
                     display: 'block',
-                    width: liHeight - 20,
-                    padding: 10,
+                    width: liHeight,
                     position: 'absolute',
-                    top:(liHeight-elWidth)/2 - 30 + 'px',
+                    top:(liHeight-elWidth)/2 + 'px',
                     left: -(liHeight-liWidth)/2 + 'px'
                 })
             });

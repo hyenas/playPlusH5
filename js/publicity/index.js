@@ -29,8 +29,7 @@ require(['Zepto','PP','slider'], function () {
     //setTimeout(window.scrollTo(0, 0), 1);
     var work = {};
     work.data = {};
-    work.isSlideRender = false;
-    work.presentationHeight = $(window).width();
+    work.mode = "stream";//stream or presentation
 
     work.init = function(){
         //define global variable
@@ -61,7 +60,6 @@ require(['Zepto','PP','slider'], function () {
                 me.callback(data);
             },
             error:function(data) {
-                // body...
             }
         });
     };
@@ -316,10 +314,10 @@ require(['Zepto','PP','slider'], function () {
 
             if(shotType == 'image' || shotType == 'video'){
                 if (shotType == 'image') {
-                    shotImg = $('<img>',{src:shot.content.bodyFile.url});
+                    shotImg = $('<img>',{src:shot.content.bodyFile.url+"/cm480x"});
                 } 
                 if (shotType == 'video') {
-                    shotImg = $('<video loop muted>',{src:shot.content.bodyFile.url});
+                    shotImg = $('<video loop muted>',{src:shot.content.bodyFile.url+"/cm480x"});
                 }
                 shotBlock = $('<div>',{class:'img-shot','data-idx':i});
                  
@@ -374,37 +372,42 @@ require(['Zepto','PP','slider'], function () {
     };
 
     work.onResize = function(){
-        if($(window).width() < $(window).height()){
+        if(work.mode == "stream"){
             $('.stream').css("display","block");
             $('.presentation').hide();
-            $('body').css({
-                'overflow': 'scroll'
-            })
-            work.presentationHeight = $(window).width();
             work.textHeight = 0;
             work.callback(work.data);
         }
-        else{
+        else if(work.mode == "presentation"){
             $('.stream').hide();
-            $('.presentation').css({
-                display:'block'
-            });
+            $('.presentation').css("display",'block');
 
-           $(".presentation").empty();
-           
-           $(".presentation").mobileSlider({
-                blocks: work.assemblySlider(work.data.presentation.slides),
-                width: $(window).width(),
-                height: $(window).height(),
-                during: 3000,
-                speed: 300
-            })
-
+            $(".presentation").empty();
+            if($(window).width() < $(window).height()){
+                $(".presentation").carousel({
+                    blocks: work.assemblySlider(work.data.presentation.slides),
+                    width: $(window).width(),
+                    height: $(window).height(),
+                    during: 3000,
+                    speed: 300
+                })
+            }
+            else{
+               $(".presentation").mobileSlider({
+                    blocks: work.assemblySlider(work.data.presentation.slides),
+                    width: $(window).width(),
+                    height: $(window).height(),
+                    during: 3000,
+                    speed: 300
+                })
+            }
         }
+        
     }
 
     work.bindtTransform = function() {
         $('#shotsDiv').on('click','div',function(event){
+            work.mode = "presentation";
             var currentIndex = $(event.currentTarget).data('idx');
             $('.stream').hide();
             $('.presentation').css({
@@ -412,16 +415,45 @@ require(['Zepto','PP','slider'], function () {
             });
             
             $(".presentation").empty();
+            if($(window).width() < $(window).height()){
+                $(".presentation").carousel({
+                    blocks: work.assemblySlider(work.data.presentation.slides),
+                    width: $(window).width(),
+                    height: $(window).height(),
+                    during: 3000,
+                    speed: 300,
+                    index: currentIndex + 2
+                })
+            }
+            else{
+               $(".presentation").mobileSlider({
+                    blocks: work.assemblySlider(work.data.presentation.slides),
+                    width: $(window).width(),
+                    height: $(window).height(),
+                    during: 3000,
+                    speed: 300,
+                    index: currentIndex + 2
+                })
+            }
+        })
 
-            $(".presentation").carousel({
-                blocks: work.assemblySlider(work.data.presentation.slides),
-                width: $(window).width(),
-                height: $(window).height(),
-                during: 3000,
-                speed: 300,
-                index: currentIndex + 1
-            })
+        $('.presentation').on('click',function(){
+            $('#closeSlide').fadeIn();
+            clearTimeout(window.timeOut);
+            window.timeOut = setTimeout(function(){
+                $('#closeSlide').fadeOut(1000);
+            }, 4000)
+        })
 
+        $('#closeSlide').on('click',function(){
+            work.mode = "stream";
+            $('.presentation').hide();
+            $('.stream').css({
+                display: "block",
+            });
+            work.textHeight = 0;
+            work.callback(work.data);
+            $('#closeSlide').fadeOut();
         })
     };
 
