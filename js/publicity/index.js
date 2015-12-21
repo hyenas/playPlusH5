@@ -10,7 +10,8 @@ require.config({
     paths: {
         'Zepto': 'zepto.min',
         'PP': 'PP',
-        'slider': 'slider'
+        'slider': 'slider',
+        'canvasVideoPlayer':'canvasVideoPlayer'
     },
     shim: {
         'Zepto': {
@@ -25,7 +26,9 @@ require.config({
     }
 });
 
-require(['Zepto','PP','slider'], function () {
+window.videoList = {};
+
+require(['Zepto','PP','slider','canvasVideoPlayer'], function () {
     //setTimeout(window.scrollTo(0, 0), 1);
     var work = {};
     work.data = {};
@@ -269,11 +272,16 @@ require(['Zepto','PP','slider'], function () {
         var cover=mockData.story.cover;
 
         var coverImg = $('<img>',{src: mockData.story.cover.pictureUrl});
+        var shouldPlayVideo = false;
+        var videoClass = 'a'+mockData.id;
         if (mockData.story.cover.content.type == 'video') {
-            coverImg = $('<img>',{src: mockData.story.cover.content.coverFile.url+"/cm480x"});
+            // coverImg = $('<img>',{src: mockData.story.cover.content.coverFile.url+"/cm480x"});
+            shouldPlayVideo = true;
+            coverImg = '<div class="video-responsive"><video class="video '+ videoClass +'" muted><source src="/videos/big_buck_bunny.mp4" type="video/mp4">Your browser does not support HTML5 video.</video><canvas class="canvas canvas-'+ videoClass +'"></canvas></div>';
         }
 
         if (mockData.story.cover.content.type == 'image') {
+            shouldPlayVideo = false;
             coverImg = $('<img>',{src: mockData.story.cover.content.bodyFile.url+"/cm480x"});
         }
 
@@ -284,12 +292,21 @@ require(['Zepto','PP','slider'], function () {
         banner.append($(me.mask));
         text.append(title).append(subtitle);
 
-        if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct != -1){
-            coverImg.on('load',me.hideLoading);
-            me.clipImage(coverImg,cover.picArea);
-        }
-        else{
-            coverImg.on('load',me.centerCrop);
+        if (shouldPlayVideo) {
+            var canvasVideo = new CanvasVideoPlayer({
+                videoSelector: '.'+videoClass,
+                canvasSelector: '.canvas-'+videoClass,
+                loop: true
+            });
+            canvasVideo.play();
+            window.videoList[videoClass] = canvasVideo;
+        } else {
+            if(cover.picArea && cover.picArea.startLoc && cover.picArea.startLoc.xPct != -1){
+                coverImg.on('load',me.hideLoading);
+                me.clipImage(coverImg,cover.picArea);
+            } else{
+                coverImg.on('load',me.centerCrop);
+            }
         }
     };
 
@@ -312,12 +329,16 @@ require(['Zepto','PP','slider'], function () {
             shot = shots[i];
             shotType = shot.content.type;
 
+            var videoClass = 'a'+shot.content.id;
+            var shouldPlayVideo = false;
             if(shotType == 'image' || shotType == 'video'){
                 if (shotType == 'image') {
                     shotImg = $('<img>',{src:shot.content.bodyFile.url+"/cm480x"});
                 } 
                 if (shotType == 'video') {
-                    shotImg = $('<img>',{src:shot.content.coverFile.url+"/cm480x"});
+                    shouldPlayVideo = true;
+                    // shotImg = $('<img>',{src:shot.content.coverFile.url+"/cm480x"});
+                    shotImg = '<div class="video-responsive"><video class="video '+ videoClass +'" muted><source src="/videos/big_buck_bunny.mp4" type="video/mp4">Your browser does not support HTML5 video.</video><canvas class="canvas canvas-'+ videoClass +'"></canvas></div>';
                 }
                 shotBlock = $('<div>',{class:'img-shot','data-idx':i});
                  
@@ -332,14 +353,21 @@ require(['Zepto','PP','slider'], function () {
                 shotBlock.append($(me.mask));
                 shotsDiv.append(shotBlock);
 
-                if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct != -1){
-                    //shotImg.data('area',shot.picAreaInShot);
-                    shotImg.on('load',me.hideLoading);
-                    me.clipImage(shotImg,shot.picAreaInShot);
-                }
-                else{
-                    //shotImg.data('area',shot.size);
-                    shotImg.on('load',me.centerCrop);
+                if (shouldPlayVideo) {
+                    var canvasVideo = new CanvasVideoPlayer({
+                        videoSelector: '.'+videoClass,
+                        canvasSelector: '.canvas-'+videoClass,
+                        loop: true
+                    });
+                    canvasVideo.play();
+                    window.videoList[videoClass] = canvasVideo;
+                } else {
+                    if(shot.picAreaInShot && shot.picAreaInShot.startLoc && shot.picAreaInShot.startLoc.xPct != -1){
+                        shotImg.on('load',me.hideLoading);
+                        me.clipImage(shotImg,shot.picAreaInShot);
+                    } else {
+                        shotImg.on('load',me.centerCrop);
+                    }
                 }
             }
 
@@ -350,7 +378,6 @@ require(['Zepto','PP','slider'], function () {
                     "text-align": shot.content.alignment,
                     top: me.caculateTextPosition() + 3,
                     margin: '10px'
-
                 })
                 
                 shotBlock.append(shotText);
