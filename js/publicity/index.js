@@ -277,7 +277,7 @@ require(['Zepto','PP','slider','canvasVideoPlayer'], function () {
         if (mockData.story.cover.content.type == 'video') {
             // coverImg = $('<img>',{src: mockData.story.cover.content.coverFile.url+"/cm480x"});
             shouldPlayVideo = true;
-            coverImg = '<video class="video '+ videoClass +'" muted><source src="/videos/big_buck_bunny.mp4" type="video/mp4">Your browser does not support HTML5 video.</video><canvas class="canvas canvas-'+ videoClass +'"></canvas>';
+            coverImg = '<video class="video '+ videoClass +'" muted><source src="'+mockData.story.cover.content.bodyFile.url+'" type="video/mp4">Your browser does not support HTML5 video.</video><canvas class="canvas canvas-'+ videoClass +'"></canvas>';
             // coverImg = '<div class="video-responsive"><video class="video '+ videoClass +'" muted><source src="/videos/big_buck_bunny.mp4" type="video/mp4">Your browser does not support HTML5 video.</video><canvas class="canvas canvas-'+ videoClass +'"></canvas></div>';
         }
 
@@ -339,7 +339,7 @@ require(['Zepto','PP','slider','canvasVideoPlayer'], function () {
                 if (shotType == 'video') {
                     shouldPlayVideo = true;
                     // shotImg = $('<img>',{src:shot.content.coverFile.url+"/cm480x"});
-                    shotImg = '<video class="video '+ videoClass +'" muted><source src="/videos/big_buck_bunny.mp4" type="video/mp4">Your browser does not support HTML5 video.</video><canvas class="canvas canvas-'+ videoClass +'"></canvas>';
+                    shotImg = '<video class="video '+ videoClass +'" muted><source src="'+shot.content.bodyFile.url+'" type="video/mp4">Your browser does not support HTML5 video.</video><canvas class="canvas canvas-'+ videoClass +'"></canvas>';
                     // shotImg = '<div class="video-responsive"><video class="video '+ videoClass +'" muted><source src="/videos/big_buck_bunny.mp4" type="video/mp4">Your browser does not support HTML5 video.</video><canvas class="canvas canvas-'+ videoClass +'"></canvas></div>';
                 }
                 shotBlock = $('<div>',{class:'img-shot','data-idx':i});
